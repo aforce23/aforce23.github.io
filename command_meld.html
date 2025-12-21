@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KHBBS Command Meld</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* Custom scrollbar for suggestions */
+        .suggestions-list::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .suggestions-list::-webkit-scrollbar-track {
+            background: #1e293b;
+        }
+
+        .suggestions-list::-webkit-scrollbar-thumb {
+            background: #475569;
+            border-radius: 4px;
+        }
+
+        .suggestions-list::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
+        }
+
+        /* Fade in animation */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+    </style>
+</head>
+
+<body class="bg-slate-900 text-slate-100 min-h-screen pb-12 selection:bg-blue-500 selection:text-white">
+
+    <!-- Header -->
+    <header class="bg-slate-950 border-b border-slate-800 p-4 shadow-lg sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="bg-blue-600 p-2 rounded-lg shadow-inner shadow-blue-400/20">
+                    <i data-lucide="sparkles" class="w-6 h-6 text-white"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold tracking-wide text-blue-100">Command Meld</h1>
+                    <p class="text-xs text-slate-400 uppercase tracking-widest">Birth by Sleep Calculator</p>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto p-4 md:p-6">
+
+        <!-- Input Section -->
+        <div class="grid md:grid-cols-[1fr_auto_1fr] gap-4 items-end mb-8 relative">
+
+            <!-- Slot 1 -->
+            <div class="relative z-20">
+                <label class="block text-xs font-bold text-blue-400 uppercase mb-2 ml-1">Command Slot 1</label>
+                <div class="relative group">
+                    <input type="text" id="slot1" placeholder="e.g. Fire"
+                        class="w-full bg-slate-800 border-2 border-slate-700 rounded-xl p-4 pl-12 text-lg focus:outline-none focus:border-blue-500 focus:shadow-[0_0_15px_rgba(59,130,246,0.3)] transition-all placeholder:text-slate-600"
+                        autocomplete="off">
+                    <i data-lucide="sword"
+                        class="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-blue-400 transition-colors"></i>
+                    <button id="clear1"
+                        class="hidden absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white">
+                        <i data-lucide="x" class="w-4 h-4"></i>
+                    </button>
+                </div>
+                <!-- Suggestions 1 -->
+                <div id="suggestions1"
+                    class="hidden absolute top-full left-0 w-full bg-slate-800 border border-slate-700 rounded-lg mt-1 max-h-60 overflow-y-auto shadow-2xl z-50 suggestions-list">
+                </div>
+            </div>
+
+            <!-- Swap Button -->
+            <div class="flex justify-center mb-2">
+                <button id="swapBtn"
+                    class="p-3 bg-slate-800 hover:bg-slate-700 rounded-full border border-slate-700 text-slate-400 hover:text-blue-400 transition-all active:scale-95">
+                    <i data-lucide="arrow-right-left" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <!-- Slot 2 -->
+            <div class="relative z-10">
+                <label class="block text-xs font-bold text-blue-400 uppercase mb-2 ml-1">Command Slot 2</label>
+                <div class="relative group">
+                    <input type="text" id="slot2" placeholder="e.g. Fire Dash"
+                        class="w-full bg-slate-800 border-2 border-slate-700 rounded-xl p-4 pl-12 text-lg focus:outline-none focus:border-blue-500 focus:shadow-[0_0_15px_rgba(59,130,246,0.3)] transition-all placeholder:text-slate-600"
+                        autocomplete="off">
+                    <i data-lucide="shield"
+                        class="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-blue-400 transition-colors"></i>
+                    <button id="clear2"
+                        class="hidden absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white">
+                        <i data-lucide="x" class="w-4 h-4"></i>
+                    </button>
+                </div>
+                <!-- Suggestions 2 -->
+                <div id="suggestions2"
+                    class="hidden absolute top-full left-0 w-full bg-slate-800 border border-slate-700 rounded-lg mt-1 max-h-60 overflow-y-auto shadow-2xl z-50 suggestions-list">
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Results Area -->
+        <div id="resultsContainer" class="space-y-6">
+            <!-- Dynamic content will be injected here -->
+        </div>
+
+    </main>
+
+    <script>
+        // --- DATA ---
+        const ABILITY_MATRIX = {
+            A: { Shimmering: "Fire Boost", Fleeting: "Magic Haste", Pulsing: "Leaf Bracer", Wellspring: "Air Combo Plus", Soothing: "HP Boost", Hungry: "HP Prize Plus", Abounding: "Link Prize Plus" },
+            B: { Shimmering: "Fire Boost", Fleeting: "Reload Boost", Pulsing: "Finish Boost", Wellspring: "Once More", Soothing: "Damage Syphon", Hungry: "HP Prize Plus", Abounding: "EXP Chance" },
+            C: { Shimmering: "Fire Screen", Fleeting: "Attack Haste", Pulsing: "Finish Boost", Wellspring: "Combo Plus", Soothing: "HP Boost", Hungry: "HP Prize Plus", Abounding: "Link Prize Plus" },
+            D: { Shimmering: "Fire Screen", Fleeting: "Attack Haste", Pulsing: "Leaf Bracer", Wellspring: "Combo Plus", Soothing: "HP Boost", Hungry: "HP Prize Plus", Abounding: "Link Prize Plus" },
+            E: { Shimmering: "Blizzard Boost", Fleeting: "Magic Haste", Pulsing: "Leaf Bracer", Wellspring: "Combo Plus", Soothing: "Item Boost", Hungry: "HP Prize Plus", Abounding: "Lucky Strike" },
+            F: { Shimmering: "Blizzard Boost", Fleeting: "Reload Boost", Pulsing: "Second Chance", Wellspring: "Air Combo Plus", Soothing: "Damage Syphon", Hungry: "HP Prize Plus", Abounding: "Lucky Strike" },
+            G: { Shimmering: "Blizzard Screen", Fleeting: "Attack Haste", Pulsing: "Leaf Bracer", Wellspring: "Air Combo Plus", Soothing: "Item Boost", Hungry: "HP Prize Plus", Abounding: "Lucky Strike" },
+            H: { Shimmering: "Blizzard Screen", Fleeting: "Magic Haste", Pulsing: "Combo F Boost", Wellspring: "Air Combo Plus", Soothing: "Item Boost", Hungry: "HP Prize Plus", Abounding: "EXP Walker" },
+            I: { Shimmering: "Thunder Boost", Fleeting: "Magic Haste", Pulsing: "Combo F Boost", Wellspring: "Air Combo Plus", Soothing: "HP Boost", Hungry: "Treasure Magnet", Abounding: "Link Prize Plus" },
+            J: { Shimmering: "Thunder Boost", Fleeting: "Reload Boost", Pulsing: "Combo F Boost", Wellspring: "Once More", Soothing: "Defender", Hungry: "Treasure Magnet", Abounding: "EXP Chance" },
+            K: { Shimmering: "Thunder Screen", Fleeting: "Attack Haste", Pulsing: "Finish Boost", Wellspring: "Combo Plus", Soothing: "HP Boost", Hungry: "Treasure Magnet", Abounding: "Link Prize Plus" },
+            L: { Shimmering: "Thunder Screen", Fleeting: "Attack Haste", Pulsing: "Finish Boost", Wellspring: "Combo Plus", Soothing: "HP Boost", Hungry: "Treasure Magnet", Abounding: "Lucky Strike" },
+            M: { Shimmering: "Cure Boost", Fleeting: "Magic Haste", Pulsing: "Combo F Boost", Wellspring: "Combo Plus", Soothing: "Item Boost", Hungry: "Treasure Magnet", Abounding: "Lucky Strike" },
+            N: { Shimmering: "Cure Boost", Fleeting: "Reload Boost", Pulsing: "Second Chance", Wellspring: "Combo Plus", Soothing: "Defender", Hungry: "Treasure Magnet", Abounding: "Lucky Strike" },
+            O: { Shimmering: "Dark Screen", Fleeting: "Attack Haste", Pulsing: "Finish Boost", Wellspring: "Air Combo Plus", Soothing: "Item Boost", Hungry: "Treasure Magnet", Abounding: "Lucky Strike" },
+            P: { Shimmering: "Dark Screen", Fleeting: "Magic Haste", Pulsing: "Combo F Boost", Wellspring: "Air Combo Plus", Soothing: "Item Boost", Hungry: "Treasure Magnet", Abounding: "EXP Walker" }
+        };
+
+        const RECIPES = [
+            { result: "Blitz", s1: "Slot Edge", s2: "Quick Blitz", type: "O" },
+            { result: "Blitz", s1: "Stun Edge", s2: "Stun Edge", type: "K" },
+            { result: "Meteor Crash", s1: "Blitz", s2: "Quake", type: "N" },
+            { result: "Fire Strike", s1: "Brutal Blast", s2: "Brutal Blast", type: "D" },
+            { result: "Magic Hour", s1: "Blitz", s2: "Zero Graviga", type: "O" },
+            { result: "Barrier Surge", s1: "Aeroga", s2: "Aeroga", type: "N" },
+            { result: "Fire Dash", s1: "Sliding Dash", s2: "Fire", type: "D" },
+            { result: "Fire Dash", s1: "Sliding Dash", s2: "Fira", type: "C" },
+            { result: "Confusion Strike", s1: "Fire", s2: "Dark Haze", type: "D" },
+            { result: "Fire Dash", s1: "Zero Gravira", s2: "Zero Gravira", type: "D" },
+            { result: "Blackout", s1: "Zero Gravity", s2: "Zero Gravity", type: "A" },
+            { result: "Fire Surge", s1: "Fire Dash", s2: "Ignite", type: "D" },
+            { result: "Fire Surge", s1: "Fira", s2: "Fire Strike", type: "A" },
+            { result: "Confusion Strike", s1: "Binding Strike", s2: "Confusion Strike", type: "O" },
+            { result: "Barrier Surge", s1: "Barrier", s2: "Fire Dash", type: "D" },
+            { result: "Sonic Blade", s1: "Blitz", s2: "Air Slide", type: "N" },
+            { result: "Sonic Blade", s1: "Fire Dash", s2: "Thunder Surge", type: "K" },
+            { result: "Chaos Blade", s1: "Dark Haze", s2: "Sonic Blade", type: "B" },
+            { result: "Zantetsuken", s1: "Stopga", s2: "Dark Haze", type: "B" },
+            { result: "Strike Raid", s1: "Quick Blitz", s2: "Sliding Dash", type: "O" },
+            { result: "Freeze Raid", s1: "Strike Raid", s2: "Blizzara", type: "I" },
+            { result: "Freeze Raid", s1: "Blizzard Edge", s2: "Binding Strike", type: "K" },
+            { result: "Treasure Raid", s1: "Slot Edge", s2: "Strike Raid", type: "O" },
+            { result: "Treasure Raid", s1: "Magnet", s2: "Magnet", type: "D" },
+            { result: "Spark Raid", s1: "Magnega", s2: "Freeze Raid", type: "J" },
+            { result: "Wind Raid", s1: "Aeroga", s2: "Freeze Raid", type: "B" },
+            { result: "Ars Solum", s1: "Dark Haze", s2: "Sonic Blade", type: "B", rare: true },
+            { result: "Ars Arcanum", s1: "Blitz", s2: "Aerial Slam", type: "F" },
+            { result: "Time Splicer", s1: "Aerial Slam", s2: "Stopga", type: "F" },
+            { result: "Magnet Spiral", s1: "Binding Strike", s2: "Collision Magnet", type: "K" },
+            { result: "Tornado Strike", s1: "Aeroga", s2: "Confusion Strike", type: "G" },
+            { result: "Geo Impact", s1: "Brutal Blast", s2: "Brutal Blast", type: "N" },
+            { result: "Sacrifice", s1: "Warp", s2: "Dark Haze", type: "B" },
+            { result: "Break Time", s1: "Curaga", s2: "Renewal Block", type: "N" },
+            { result: "Fira", s1: "Fire", s2: "Fire Dash", type: "D" },
+            { result: "Fira", s1: "Fire", s2: "Fire Strike", type: "D" },
+            { result: "Fira", s1: "Fire", s2: "Fire", type: "A" },
+            { result: "Fira", s1: "Fire", s2: "Ignite", type: "C" },
+            { result: "Firaga", s1: "Fira", s2: "Fire Dash", type: "D" },
+            { result: "Firaga", s1: "Fire", s2: "Fira", type: "B" },
+            { result: "Dark Firaga", s1: "Firaga", s2: "Dark Haze", type: "D" },
+            { result: "Dark Firaga", s1: "Blackout", s2: "Firaga", type: "B" },
+            { result: "Fission Firaga", s1: "Fira", s2: "Aeroga", type: "A" },
+            { result: "Fission Firaga", s1: "Firaga", s2: "Aerora", type: "A" },
+            { result: "Triple Firaga", s1: "Firaga", s2: "Blitz", type: "D" },
+            { result: "Triple Firaga", s1: "Fira", s2: "Firaga", type: "A" },
+            { result: "Crawling Fire", s1: "Firaga", s2: "Slow", type: "A" },
+            { result: "Crawling Fire", s1: "Firaga", s2: "Stopra", type: "D" },
+            { result: "Blizzara", s1: "Blizzard", s2: "Strike Raid", type: "G" },
+            { result: "Blizzara", s1: "Blizzard", s2: "Blizzard Edge", type: "G" },
+            { result: "Blizzara", s1: "Blizzard", s2: "Blizzard", type: "E" },
+            { result: "Blizzara", s1: "Blizzard", s2: "Aero", type: "H" },
+            { result: "Blizzaga", s1: "Blizzara", s2: "Blizzard Edge", type: "G" },
+            { result: "Blizzaga", s1: "Blizzara", s2: "Blizzard", type: "E" },
+            { result: "Triple Blizzaga", s1: "Blizzaga", s2: "Blitz", type: "G" },
+            { result: "Triple Blizzaga", s1: "Blizzaga", s2: "Blizzara", type: "E" },
+            { result: "Thundara", s1: "Thunder", s2: "Stun Edge", type: "K" },
+            { result: "Thundara", s1: "Thunder", s2: "Thunder", type: "I" },
+            { result: "Thundara", s1: "Zero Gravity", s2: "Magnet", type: "L" },
+            { result: "Thundaga", s1: "Thundara", s2: "Binding Strike", type: "K" },
+            { result: "Thundaga", s1: "Thundara", s2: "Thunder", type: "I" },
+            { result: "Thundaga Shot", s1: "Thundaga", s2: "Strike Raid", type: "I" },
+            { result: "Thundaga Shot", s1: "Thundaga", s2: "Freeze Raid", type: "E" },
+            { result: "Cura", s1: "Cure", s2: "Thunder", type: "I" },
+            { result: "Cura", s1: "Cure", s2: "Cure", type: "M" },
+            { result: "Curaga", s1: "Cura", s2: "Cure", type: "M" },
+            { result: "Mine Shield", s1: "Fira", s2: "Zero Gravity", type: "A" },
+            { result: "Mine Shield", s1: "Ignite", s2: "Stop", type: "D" },
+            { result: "Mine Square", s1: "Fira", s2: "Stop", type: "A" },
+            { result: "Mine Square", s1: "Aerora", s2: "Ignite", type: "D" },
+            { result: "Seeker Mine", s1: "Mine Shield", s2: "Mine Square", type: "B" },
+            { result: "Zero Gravira", s1: "Zero Gravity", s2: "Thunder", type: "I" },
+            { result: "Zero Gravira", s1: "Zero Gravity", s2: "Zero Gravity", type: "M" },
+            { result: "Zero Graviga", s1: "Zero Gravira", s2: "Thundara", type: "I" },
+            { result: "Magnera", s1: "Magnet", s2: "Stun Edge", type: "K" },
+            { result: "Magnera", s1: "Magnet", s2: "Thunder", type: "I" },
+            { result: "Magnega", s1: "Magnera", s2: "Magnet", type: "I" },
+            { result: "Munny Magnet", s1: "Magnera", s2: "Wishing Edge", type: "K" },
+            { result: "Energy Magnet", s1: "Magnera", s2: "Cure", type: "M" },
+            { result: "D-Link Magnet", s1: "Magnera", s2: "Zero Gravira", type: "L" },
+            { result: "Aerora", s1: "Aero", s2: "Quick Blitz", type: "G" },
+            { result: "Aerora", s1: "Aero", s2: "Thunder", type: "I" },
+            { result: "Aerora", s1: "Aero", s2: "Aero", type: "E" },
+            { result: "Aeroga", s1: "Aerora", s2: "Quick Blitz", type: "O" },
+            { result: "Aeroga", s1: "Aerora", s2: "Aero", type: "M" },
+            { result: "Warp", s1: "Zero Gravira", s2: "Thundara", type: "I" },
+            { result: "Faith", s1: "Wind Raid", s2: "Break Time", type: "N" },
+            { result: "Deep Freeze", s1: "Blizzaga", s2: "Freeze Raid", type: "G" },
+            { result: "Glacier", s1: "Deep Freeze", s2: "Blizzaga", type: "E" },
+            { result: "Ice Barrage", s1: "Blizzaga", s2: "Mine Shield", type: "F" },
+            { result: "Firaga Burst", s1: "Fira", s2: "Aeroga", type: "A" },
+            { result: "Raging Storm", s1: "Fission Firaga", s2: "Firaga Burst", type: "B" },
+            { result: "Mega Flare", s1: "Fission Firaga", s2: "Crawling Fire", type: "B" },
+            { result: "Quake", s1: "Brutal Blast", s2: "Zero Graviga", type: "B" },
+            { result: "Meteor", s1: "Geo Impact", s2: "Quake", type: "B" },
+            { result: "Tornado", s1: "Magnega", s2: "Aeroga", type: "N" },
+            { result: "Transcendence", s1: "Magnet Spiral", s2: "Zero Graviga", type: "J" },
+            { result: "Mini", s1: "Magnega", s2: "Bind", type: "I" },
+            { result: "Blackout", s1: "Zero Gravity", s2: "Confuse", type: "M" },
+            { result: "Thunder Roll", s1: "Dodge Roll", s2: "Thunder Surge", type: "P" },
+            { result: "Firewheel", s1: "Cartwheel", s2: "Fire Surge", type: "B" },
+            { result: "Ice Slide", s1: "Air Slide", s2: "Blizzard Edge", type: "F" },
+            { result: "Fire Glide", s1: "Glide", s2: "Fire Surge", type: "C" },
+            { result: "Homing Slide", s1: "Sliding Dash", s2: "Magnera", type: "P" },
+            { result: "Renewal Block", s1: "Block", s2: "Curaga", type: "P" },
+            { result: "Stun Block", s1: "Block", s2: "Stun Edge", type: "L" },
+            { result: "Poison Block", s1: "Block", s2: "Poison Edge", type: "H" },
+            { result: "Payback Fang", s1: "Sliding Dash", s2: "Counter Hammer", type: "P" },
+            { result: "Lightning Ray", s1: "Blitz", s2: "Air Slide", type: "I", rare: true },
+            { result: "Bio Barrage", s1: "Poison", s2: "Quick Blitz", type: "J", rare: true },
+            { result: "Stun Edge", s1: "Quick Blitz", s2: "Thunder", type: "K" },
+            { result: "Stun Edge", s1: "Sliding Dash", s2: "Thunder", type: "K" },
+            { result: "Sliding Dash", s1: "Quick Blitz", s2: "Blizzard", type: "G" },
+            { result: "Poison Edge", s1: "Quick Blitz", s2: "Poison", type: "O" },
+            { result: "Poison Edge", s1: "Sliding Dash", s2: "Poison", type: "K" },
+            { result: "Wishing Edge", s1: "Slot Edge", s2: "Barrier Surge", type: "P" },
+            { result: "Blizzard Edge", s1: "Quick Blitz", s2: "Blizzard", type: "G" },
+            { result: "Binding Strike", s1: "Quick Blitz", s2: "Bind", type: "K" }
+        ];
+
+        const UNIQUE_COMMANDS = Array.from(new Set(RECIPES.flatMap(r => [r.s1, r.s2]))).sort();
+
+        // --- ELEMENTS ---
+        const slot1Input = document.getElementById('slot1');
+        const slot2Input = document.getElementById('slot2');
+        const clear1Btn = document.getElementById('clear1');
+        const clear2Btn = document.getElementById('clear2');
+        const suggestions1 = document.getElementById('suggestions1');
+        const suggestions2 = document.getElementById('suggestions2');
+        const swapBtn = document.getElementById('swapBtn');
+        const resultsContainer = document.getElementById('resultsContainer');
+
+        // --- LOGIC ---
+
+        function calculate() {
+            const s1 = slot1Input.value.trim().toLowerCase();
+            const s2 = slot2Input.value.trim().toLowerCase();
+
+            // Toggle clear buttons
+            clear1Btn.classList.toggle('hidden', slot1Input.value === '');
+            clear2Btn.classList.toggle('hidden', slot2Input.value === '');
+
+            if (!s1 || !s2) {
+                resultsContainer.innerHTML = '';
+                return;
+            }
+
+            const found = RECIPES.filter(r =>
+                (r.s1.toLowerCase() === s1 && r.s2.toLowerCase() === s2) ||
+                (r.s1.toLowerCase() === s2 && r.s2.toLowerCase() === s1)
+            );
+
+            renderResults(found);
+        }
+
+        function renderResults(results) {
+            resultsContainer.innerHTML = '';
+
+            if (results.length === 0) {
+                resultsContainer.innerHTML = `
+                    <div class="text-center p-8 bg-slate-800/50 rounded-2xl border border-dashed border-slate-700 animate-fade-in">
+                        <i data-lucide="search" class="w-8 h-8 mx-auto text-slate-600 mb-2"></i>
+                        <p class="text-slate-400">No known recipe found for this combination.</p>
+                        <p class="text-sm text-slate-500 mt-1">Try reversing the inputs or checking command spelling.</p>
+                    </div>
+                `;
+            } else {
+                results.forEach(res => {
+                    const card = document.createElement('div');
+                    card.className = "bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700 rounded-2xl overflow-hidden shadow-xl animate-fade-in";
+
+                    const rareBadge = res.rare ? `<span class="px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">Rare Recipe</span>` : '';
+
+                    let abilitiesHtml = '';
+                    if (ABILITY_MATRIX[res.type]) {
+                        Object.entries(ABILITY_MATRIX[res.type]).forEach(([crystal, ability]) => {
+                            let colorClass = "text-slate-200";
+                            if (ability.includes("Boost") || ability.includes("Haste")) colorClass = "text-blue-300";
+                            else if (ability.includes("Screen") || ability.includes("Guard") || ability.includes("Leaf")) colorClass = "text-emerald-300";
+                            else if (ability.includes("Lucky") || ability.includes("Prize")) colorClass = "text-amber-300";
+
+                            abilitiesHtml += `
+                                <div class="flex items-center justify-between p-3 rounded-lg bg-slate-800 border border-slate-700/50 hover:border-slate-600 transition-colors">
+                                    <span class="text-slate-400 text-sm">${crystal}</span>
+                                    <span class="font-semibold text-sm ${colorClass}">${ability}</span>
+                                </div>
+                            `;
+                        });
+                    } else {
+                        abilitiesHtml = `<p class="text-slate-500 italic">No ability data available for Type ${res.type}</p>`;
+                    }
+
+                    card.innerHTML = `
+                        <div class="p-6 md:p-8 flex flex-col md:flex-row items-center md:items-start justify-between gap-6 border-b border-slate-700/50">
+                            <div class="flex items-center gap-4">
+                                <div class="w-16 h-16 bg-blue-500/10 rounded-2xl flex items-center justify-center border border-blue-500/30 shadow-[0_0_30px_rgba(59,130,246,0.15)]">
+                                    <i data-lucide="zap" class="w-8 h-8 text-blue-400"></i>
+                                </div>
+                                <div>
+                                    <h2 class="text-3xl font-bold text-white mb-1">${res.result}</h2>
+                                    <div class="flex gap-2 text-sm">
+                                        <span class="px-2 py-0.5 rounded bg-slate-700 text-slate-300 border border-slate-600">Type ${res.type}</span>
+                                        ${rareBadge}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-6 bg-slate-900/50">
+                            <h3 class="text-sm font-bold uppercase text-slate-500 mb-4 flex items-center gap-2">
+                                <i data-lucide="sparkles" class="w-4 h-4"></i>
+                                Resulting Abilities by Crystal
+                            </h3>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                                ${abilitiesHtml}
+                            </div>
+                        </div>
+                    `;
+                    resultsContainer.appendChild(card);
+                });
+            }
+            lucide.createIcons();
+        }
+
+        // --- AUTOCOMPLETE LOGIC ---
+
+        function setupAutocomplete(input, list) {
+            input.addEventListener('input', () => {
+                const val = input.value.toLowerCase();
+                list.innerHTML = '';
+                if (!val) {
+                    list.classList.add('hidden');
+                    calculate();
+                    return;
+                }
+
+                const matches = UNIQUE_COMMANDS.filter(c => c.toLowerCase().includes(val));
+
+                if (matches.length > 0) {
+                    list.classList.remove('hidden');
+                    matches.forEach(match => {
+                        const btn = document.createElement('button');
+                        btn.className = "w-full text-left px-4 py-2 hover:bg-blue-600/20 hover:text-blue-200 transition-colors border-b border-slate-700/50 last:border-0 text-slate-300";
+                        btn.textContent = match;
+                        btn.addEventListener('click', () => {
+                            input.value = match;
+                            list.classList.add('hidden');
+                            calculate();
+                        });
+                        list.appendChild(btn);
+                    });
+                } else {
+                    list.classList.add('hidden');
+                }
+                calculate();
+            });
+
+            input.addEventListener('focus', () => {
+                const val = input.value.toLowerCase();
+                if (val && list.children.length > 0) list.classList.remove('hidden');
+            });
+        }
+
+        setupAutocomplete(slot1Input, suggestions1);
+        setupAutocomplete(slot2Input, suggestions2);
+
+        // Click outside to close suggestions
+        document.addEventListener('click', (e) => {
+            if (!slot1Input.contains(e.target) && !suggestions1.contains(e.target)) {
+                suggestions1.classList.add('hidden');
+            }
+            if (!slot2Input.contains(e.target) && !suggestions2.contains(e.target)) {
+                suggestions2.classList.add('hidden');
+            }
+        });
+
+        // --- BUTTONS ---
+
+        swapBtn.addEventListener('click', () => {
+            const temp = slot1Input.value;
+            slot1Input.value = slot2Input.value;
+            slot2Input.value = temp;
+            calculate();
+        });
+
+        clear1Btn.addEventListener('click', () => {
+            slot1Input.value = '';
+            calculate();
+            suggestions1.innerHTML = ''; // Clear suggestions
+        });
+
+        clear2Btn.addEventListener('click', () => {
+            slot2Input.value = '';
+            calculate();
+            suggestions2.innerHTML = ''; // Clear suggestions
+        });
+
+        // Initial Icon Load
+        lucide.createIcons();
+
+    </script>
+</body>
+
+</html>
