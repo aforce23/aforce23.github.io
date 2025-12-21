@@ -461,11 +461,11 @@
 
         // --- CATEGORY LISTS ---
         const ATTACK_CMDS = new Set([
-            "Blitz", "Meteor Crash", "Fire Strike", "Magic Hour", "Barrier Surge", "Fire Dash", "Confusion Strike",
+            "Blitz", "Meteor Crash", "Fire Strike", "Magic Hour", "Barrier Surge", "Fire Dash", "Dark Haze", "Confusion Strike",
             "Fire Surge", "Sonic Blade", "Chaos Blade", "Zantetsuken", "Strike Raid", "Freeze Raid", "Treasure Raid",
             "Spark Raid", "Wind Raid", "Ars Solum", "Ars Arcanum", "Time Splicer", "Magnet Spiral", "Tornado Strike",
             "Geo Impact", "Sacrifice", "Break Time", "Slot Edge", "Stun Edge", "Quick Blitz", "Sliding Dash",
-            "Poison Edge", "Wishing Edge", "Blizzard Edge", "Binding Strike", "Brutal Blast"
+            "Poison Edge", "Wishing Edge", "Blizzard Edge", "Binding Strike", "Brutal Blast", "Aerial Slam"
         ]);
 
         const MAGIC_CMDS = new Set([
@@ -593,9 +593,16 @@
                     if (ABILITY_MATRIX[res.type]) {
                         Object.entries(ABILITY_MATRIX[res.type]).forEach(([crystal, ability]) => {
                             let colorClass = "text-slate-200";
-                            if (ability.includes("Boost") || ability.includes("Haste")) colorClass = "text-blue-300";
-                            else if (ability.includes("Screen") || ability.includes("Guard") || ability.includes("Leaf")) colorClass = "text-emerald-300";
-                            else if (ability.includes("Lucky") || ability.includes("Prize")) colorClass = "text-amber-300";
+                            if (ability.includes("Fire")) colorClass = "text-red-300";
+                            else if (ability.includes("Combo")) colorClass = "text-gray-300";
+                            else if (ability.includes("Lucky")) colorClass = "text-amber-300";
+                            else if (ability.includes("Thunder") || ability.includes("Treasure")) colorClass = "text-yellow-300";
+                            else if (ability.includes("Blizzard") || ability.includes("Defender")) colorClass = "text-blue-300";
+                            else if (ability.includes("Magic")) colorClass = "text-purple-300";
+                            else if (ability.includes("Link")) colorClass = "text-cyan-300";
+                            else if (ability.includes("Reload")) colorClass = "text-rose-500";
+                            else if (ability.includes("HP") || ability.includes("HP") || ability.includes("Syphon") || ability.includes("Bracer") || ability.includes("Second") || ability.includes("Once")) colorClass = "text-emerald-300";
+
 
                             abilitiesHtml += `
                                 <div class="flex items-center justify-between p-3 rounded-lg bg-slate-800 border border-slate-700/50 hover:border-slate-600 transition-colors">
