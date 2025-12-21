@@ -64,11 +64,11 @@
         <div class="max-w-4xl mx-auto flex items-center justify-between">
             <div class="flex items-center gap-3">
                 <div class="bg-blue-600 p-2 rounded-lg shadow-inner shadow-blue-400/20">
-                    <i data-lucide="sparkles" class="w-6 h-6 text-white"></i>
+                    <i data-lucide="crown" class="w-6 h-6 text-white"></i>
                 </div>
                 <div>
-                    <h1 class="text-xl font-bold tracking-wide text-blue-100">Command Meld</h1>
-                    <p class="text-xs text-slate-400 uppercase tracking-widest">Birth by Sleep Calculator</p>
+                    <h1 class="text-xl font-bold tracking-wide text-blue-100">Kingdom Hearts: Birth by Sleep</h1>
+                    <p class="text-xs text-slate-400 uppercase tracking-widest">Command Meld Calculator</p>
                 </div>
             </div>
         </div>
@@ -86,8 +86,8 @@
                     <input type="text" id="slot1" placeholder="e.g. Fire"
                         class="w-full bg-slate-800 border-2 border-slate-700 rounded-xl p-4 pl-12 text-lg focus:outline-none focus:border-blue-500 focus:shadow-[0_0_15px_rgba(59,130,246,0.3)] transition-all placeholder:text-slate-600"
                         autocomplete="off">
-                    <i data-lucide="sword"
-                        class="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-blue-400 transition-colors"></i>
+                    <i id="icon-slot1" data-lucide="circle-dashed"
+                        class="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 transition-colors"></i>
                     <button id="clear1"
                         class="hidden absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white">
                         <i data-lucide="x" class="w-4 h-4"></i>
@@ -114,8 +114,8 @@
                     <input type="text" id="slot2" placeholder="e.g. Fire Dash"
                         class="w-full bg-slate-800 border-2 border-slate-700 rounded-xl p-4 pl-12 text-lg focus:outline-none focus:border-blue-500 focus:shadow-[0_0_15px_rgba(59,130,246,0.3)] transition-all placeholder:text-slate-600"
                         autocomplete="off">
-                    <i data-lucide="shield"
-                        class="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-blue-400 transition-colors"></i>
+                    <i id="icon-slot2" data-lucide="circle-dashed"
+                        class="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 transition-colors"></i>
                     <button id="clear2"
                         class="hidden absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white">
                         <i data-lucide="x" class="w-4 h-4"></i>
@@ -159,126 +159,334 @@
 
         const RECIPES = [
             { result: "Blitz", s1: "Slot Edge", s2: "Quick Blitz", type: "O" },
-            { result: "Blitz", s1: "Stun Edge", s2: "Stun Edge", type: "K" },
+            { result: "Blitz", s1: "Slot Edge", s2: "Stun Edge", type: "K" },
+            { result: "Blitz", s1: "Barrier Surge", s2: "Wishing Edge", type: "P" },
             { result: "Meteor Crash", s1: "Blitz", s2: "Quake", type: "N" },
-            { result: "Fire Strike", s1: "Brutal Blast", s2: "Brutal Blast", type: "D" },
+            { result: "Meteor Crash", s1: "Fire Strike", s2: "Brutal Blast", type: "D" },
             { result: "Magic Hour", s1: "Blitz", s2: "Zero Graviga", type: "O" },
-            { result: "Barrier Surge", s1: "Aeroga", s2: "Aeroga", type: "N" },
+            { result: "Magic Hour", s1: "Barrier Surge", s2: "Aeroga", type: "N" },
             { result: "Fire Dash", s1: "Sliding Dash", s2: "Fire", type: "D" },
             { result: "Fire Dash", s1: "Sliding Dash", s2: "Fira", type: "C" },
-            { result: "Confusion Strike", s1: "Fire", s2: "Dark Haze", type: "D" },
-            { result: "Fire Dash", s1: "Zero Gravira", s2: "Zero Gravira", type: "D" },
-            { result: "Blackout", s1: "Zero Gravity", s2: "Zero Gravity", type: "A" },
-            { result: "Fire Surge", s1: "Fire Dash", s2: "Ignite", type: "D" },
-            { result: "Fire Surge", s1: "Fira", s2: "Fire Strike", type: "A" },
-            { result: "Confusion Strike", s1: "Binding Strike", s2: "Confusion Strike", type: "O" },
-            { result: "Barrier Surge", s1: "Barrier", s2: "Fire Dash", type: "D" },
+            { result: "Fire Dash", s1: "Confusion Strike", s2: "Fire", type: "D" },
+            { result: "Dark Haze", s1: "Fire Dash", s2: "Zero Gravira", type: "D" },
+            { result: "Dark Haze", s1: "Fire Dash", s2: "Blackout", type: "A" },
+            { result: "Dark Haze", s1: "Fire Surge", s2: "Zero Gravity", type: "C" },
             { result: "Sonic Blade", s1: "Blitz", s2: "Air Slide", type: "N" },
             { result: "Sonic Blade", s1: "Fire Dash", s2: "Thunder Surge", type: "K" },
+            { result: "Sonic Blade", s1: "Blitz", s2: "Dark Haze", type: "D" },
             { result: "Chaos Blade", s1: "Dark Haze", s2: "Sonic Blade", type: "B" },
             { result: "Zantetsuken", s1: "Stopga", s2: "Dark Haze", type: "B" },
+            { result: "Zantetsuken", s1: "Stopga", s2: "Sonic Blade", type: "F" },
             { result: "Strike Raid", s1: "Quick Blitz", s2: "Sliding Dash", type: "O" },
             { result: "Freeze Raid", s1: "Strike Raid", s2: "Blizzara", type: "I" },
             { result: "Freeze Raid", s1: "Blizzard Edge", s2: "Binding Strike", type: "K" },
             { result: "Treasure Raid", s1: "Slot Edge", s2: "Strike Raid", type: "O" },
-            { result: "Treasure Raid", s1: "Magnet", s2: "Magnet", type: "D" },
+            { result: "Treasure Raid", s1: "Slot Edge", s2: "Magnet", type: "D" },
+            { result: "Treasure Raid", s1: "Slot Edge", s2: "Magnera", type: "K" },
             { result: "Spark Raid", s1: "Magnega", s2: "Freeze Raid", type: "J" },
+            { result: "Spark Raid", s1: "Magnega", s2: "Treasure Raid", type: "N" },
+            { result: "Spark Raid", s1: "Dodge Roll", s2: "Thunder Surge", type: "P", rare: true },
+            { result: "Spark Raid", s1: "Dodge Roll", s2: "Thundaga", type: "L", rare: true },
+            { result: "Spark Raid", s1: "Dodge Roll", s2: "Stun Block", type: "L", rare: true },
             { result: "Wind Raid", s1: "Aeroga", s2: "Freeze Raid", type: "B" },
+            { result: "Wind Raid", s1: "Aeroga", s2: "Treasure Raid", type: "F" },
+            { result: "Fire Surge", s1: "Fire Dash", s2: "Ignite", type: "D" },
+            { result: "Fire Surge", s1: "Fira", s2: "Fire Strike", type: "A" },
+            { result: "Fire Surge", s1: "Fira", s2: "Confusion Strike", type: "O" },
+            { result: "Fire Surge", s1: "Fira", s2: "Binding Strike", type: "K" },
+            { result: "Barrier Surge", s1: "Barrier", s2: "Fire Dash", type: "D" },
+            { result: "Barrier Surge", s1: "Barrier", s2: "Stun Edge", type: "K" },
+            { result: "Thunder Surge", s1: "Thundara", s2: "Fire Dash", type: "D" },
+            { result: "Thunder Surge", s1: "Thundara", s2: "Freeze Raid", type: "G" },
+            { result: "Thunder Surge", s1: "Thundara", s2: "Stun Edge", type: "I" },
+            { result: "Thunder Surge", s1: "Thundara", s2: "Confusion Strike", type: "I" },
+            { result: "Aerial Slam", s1: "Fire Dash", s2: "High Jump", type: "A" },
+            { result: "Aerial Slam", s1: "Fire Surge", s2: "Aero", type: "D" },
+            { result: "Aerial Slam", s1: "Fire Strike", s2: "Aerora", type: "C" },
             { result: "Ars Solum", s1: "Dark Haze", s2: "Sonic Blade", type: "B", rare: true },
+            { result: "Ars Solum", s1: "Dark Haze", s2: "Stopga", type: "B", rare: true },
+            { result: "Ars Solum", s1: "Sonic Blade", s2: "Stopga", type: "K", rare: true },
+            { result: "Ars Solum", s1: "Thunder", s2: "Sliding Dash", type: "K", rare: true },
+            { result: "Ars Solum", s1: "Thunder", s2: "Strike Raid", type: "L", rare: true },
+            { result: "Ars Solum", s1: "Thundara", s2: "Strike Raid", type: "K", rare: true },
+            { result: "Ars Solum", s1: "Thundara", s2: "Confusion Strike", type: "I", rare: true },
             { result: "Ars Arcanum", s1: "Blitz", s2: "Aerial Slam", type: "F" },
+            { result: "Ars Arcanum", s1: "Quick Blitz", s2: "Slot Edge", type: "O", rare: true },
+            { result: "Ars Arcanum", s1: "Quick Blitz", s2: "Blizzard", type: "G", rare: true },
+            { result: "Ars Arcanum", s1: "Quick Blitz", s2: "Blizzara", type: "H", rare: true },
+            { result: "Ars Arcanum", s1: "Sliding Dash", s2: "Blizzard", type: "E", rare: true },
+            { result: "Ars Arcanum", s1: "Sliding Dash", s2: "Blizzara", type: "G", rare: true },
+            { result: "Ars Arcanum", s1: "Cura", s2: "Poison Edge", type: "P", rare: true },
+            { result: "Ars Arcanum", s1: "Cura", s2: "Blizzard Edge", type: "G", rare: true },
+            { result: "Ars Arcanum", s1: "Fire Strike", s2: "Aerora", type: "C", rare: true },
             { result: "Time Splicer", s1: "Aerial Slam", s2: "Stopga", type: "F" },
-            { result: "Magnet Spiral", s1: "Binding Strike", s2: "Collision Magnet", type: "K" },
+            { result: "Time Splicer", s1: "Stun Edge", s2: "Slot Edge", type: "K", rare: true },
+            { result: "Time Splicer", s1: "Barrier Surge", s2: "Wishing Edge", type: "P", rare: true },
+            { result: "Time Splicer", s1: "Stopga", s2: "Barrier", type: "C", rare: true },
+            { result: "Poison Edge", s1: "Poison", s2: "Quick Blitz", type: "O" },
+            { result: "Poison Edge", s1: "Poison", s2: "Sliding Dash", type: "K" },
+            { result: "Poison Edge", s1: "Poison", s2: "Strike Raid", type: "D" },
+            { result: "Wishing Edge", s1: "Barrier Surge", s2: "Strike Raid", type: "O" },
+            { result: "Wishing Edge", s1: "Barrier Surge", s2: "Stun Edge", type: "K" },
+            { result: "Wishing Edge", s1: "Stun Edge", s2: "Binding Strike", type: "J" },
+            { result: "Blizzard Edge", s1: "Quick Blitz", s2: "Blizzard", type: "G" },
+            { result: "Blizzard Edge", s1: "Quick Blitz", s2: "Blizzara", type: "H" },
+            { result: "Blizzard Edge", s1: "Sliding Dash", s2: "Blizzard", type: "E" },
+            { result: "Blizzard Edge", s1: "Sliding Dash", s2: "Blizzara", type: "G" },
+            { result: "Stun Edge", s1: "Sliding Dash", s2: "Thunder", type: "K" },
+            { result: "Stun Edge", s1: "Strike Raid", s2: "Thunder", type: "L" },
+            { result: "Stun Edge", s1: "Strike Raid", s2: "Thundara", type: "K" },
+            { result: "Slot Edge", s1: "Cura", s2: "Poison Edge", type: "P" },
+            { result: "Slot Edge", s1: "Cura", s2: "Blizzard Edge", type: "G" },
+            { result: "Slot Edge", s1: "Curaga", s2: "Renewal Block", type: "N" },
+            { result: "Slot Edge", s1: "Curaga", s2: "Focus Block", type: "P" },
+            { result: "Slot Edge", s1: "Curaga", s2: "Renewal Barrier", type: "N" },
+            { result: "Slot Edge", s1: "Curaga", s2: "Focus Barrier", type: "P" },
+            { result: "Slot Edge", s1: "Wishing Edge", s2: "Cure", type: "O" },
+            { result: "Fire Strike", s1: "Poison Edge", s2: "Fira", type: "D" },
+            { result: "Fire Strike", s1: "Stun Edge", s2: "Fire", type: "K" },
+            { result: "Fire Strike", s1: "Wishing Edge", s2: "Ignite", type: "A" },
+            { result: "Confusion Strike", s1: "Confuse", s2: "Quick Blitz", type: "O" },
+            { result: "Confusion Strike", s1: "Confuse", s2: "Strike Raid", type: "G" },
+            { result: "Confusion Strike", s1: "Sliding Dash", s2: "Zero Gravity", type: "K" },
+            { result: "Binding Strike", s1: "Bind", s2: "Quick Blitz", type: "K" },
+            { result: "Binding Strike", s1: "Bind", s2: "Strike Raid", type: "O" },
+            { result: "Binding Strike", s1: "Stun Edge", s2: "Zero Gravity", type: "I" },
+            { result: "Brutal Blast", s1: "Stun Edge", s2: "Mine Shield", type: "O" },
+            { result: "Brutal Blast", s1: "Binding Strike", s2: "Mine Square", type: "L" },
             { result: "Tornado Strike", s1: "Aeroga", s2: "Confusion Strike", type: "G" },
+            { result: "Tornado Strike", s1: "Aeroga", s2: "Binding Strike", type: "F" },
+            { result: "Magnet Spiral", s1: "Binding Strike", s2: "Collision Magnet", type: "K" },
+            { result: "Magnet Spiral", s1: "Binding Strike", s2: "Magnega", type: "J" },
+            { result: "Magnet Spiral", s1: "Magnera", s2: "Quick Blitz", type: "K", rare: true },
+            { result: "Magnet Spiral", s1: "Magnera", s2: "Stun Edge", type: "L", rare: true },
+            { result: "Magnet Spiral", s1: "Zero Gravira", s2: "Magnet", type: "I", rare: true },
+            { result: "Windcutter", s1: "Aeroga", s2: "Binding Strike", type: "F" },
+            { result: "Windcutter", s1: "Aeroga", s2: "Confusion Strike", type: "G" },
+            { result: "Limit Storm", s1: "Brutal Blast", s2: "Confusion Strike", type: "G" },
+            { result: "Limit Storm", s1: "Brutal Blast", s2: "Binding Strike", type: "D" },
+            { result: "Salvation", s1: "Wind Raid", s2: "Curaga", type: "N" },
+            { result: "Collision Magnet", s1: "Magnera", s2: "Quick Blitz", type: "K" },
+            { result: "Collision Magnet", s1: "Magnera", s2: "Stun Edge", type: "L" },
+            { result: "Collision Magnet", s1: "Zero Gravira", s2: "Magnet", type: "I" },
             { result: "Geo Impact", s1: "Brutal Blast", s2: "Brutal Blast", type: "N" },
             { result: "Sacrifice", s1: "Warp", s2: "Dark Haze", type: "B" },
-            { result: "Break Time", s1: "Curaga", s2: "Renewal Block", type: "N" },
+            { result: "Sacrifice", s1: "Warp", s2: "Poison Edge", type: "D" },
+            { result: "Break Time", s1: "Curaga", s2: "Renewal Block", type: "N", rare: true },
+            { result: "Break Time", s1: "Curaga", s2: "Focus Block", type: "P", rare: true },
+            { result: "Break Time", s1: "Curaga", s2: "Renewal Barrier", type: "N", rare: true },
+            { result: "Break Time", s1: "Curaga", s2: "Focus Barrier", type: "P", rare: true },
             { result: "Fira", s1: "Fire", s2: "Fire Dash", type: "D" },
             { result: "Fira", s1: "Fire", s2: "Fire Strike", type: "D" },
             { result: "Fira", s1: "Fire", s2: "Fire", type: "A" },
             { result: "Fira", s1: "Fire", s2: "Ignite", type: "C" },
             { result: "Firaga", s1: "Fira", s2: "Fire Dash", type: "D" },
-            { result: "Firaga", s1: "Fire", s2: "Fira", type: "B" },
+            { result: "Firaga", s1: "Fira", s2: "Fire", type: "A" },
+            { result: "Firaga", s1: "Fira", s2: "Fira", type: "B" },
             { result: "Dark Firaga", s1: "Firaga", s2: "Dark Haze", type: "D" },
-            { result: "Dark Firaga", s1: "Blackout", s2: "Firaga", type: "B" },
+            { result: "Dark Firaga", s1: "Firaga", s2: "Blackout", type: "B" },
             { result: "Fission Firaga", s1: "Fira", s2: "Aeroga", type: "A" },
             { result: "Fission Firaga", s1: "Firaga", s2: "Aerora", type: "A" },
+            { result: "Fission Firaga", s1: "Firaga", s2: "Aeroga", type: "B" },
             { result: "Triple Firaga", s1: "Firaga", s2: "Blitz", type: "D" },
-            { result: "Triple Firaga", s1: "Fira", s2: "Firaga", type: "A" },
+            { result: "Triple Firaga", s1: "Firaga", s2: "Fira", type: "A" },
+            { result: "Triple Firaga", s1: "Firaga", s2: "Firaga", type: "B" },
             { result: "Crawling Fire", s1: "Firaga", s2: "Slow", type: "A" },
             { result: "Crawling Fire", s1: "Firaga", s2: "Stopra", type: "D" },
+            { result: "Crawling Fire", s1: "Firaga", s2: "Stopga", type: "B" },
             { result: "Blizzara", s1: "Blizzard", s2: "Strike Raid", type: "G" },
             { result: "Blizzara", s1: "Blizzard", s2: "Blizzard Edge", type: "G" },
             { result: "Blizzara", s1: "Blizzard", s2: "Blizzard", type: "E" },
             { result: "Blizzara", s1: "Blizzard", s2: "Aero", type: "H" },
             { result: "Blizzaga", s1: "Blizzara", s2: "Blizzard Edge", type: "G" },
             { result: "Blizzaga", s1: "Blizzara", s2: "Blizzard", type: "E" },
+            { result: "Blizzaga", s1: "Blizzara", s2: "Blizzara", type: "F" },
             { result: "Triple Blizzaga", s1: "Blizzaga", s2: "Blitz", type: "G" },
             { result: "Triple Blizzaga", s1: "Blizzaga", s2: "Blizzara", type: "E" },
+            { result: "Triple Blizzaga", s1: "Blizzaga", s2: "Blizzaga", type: "F" },
             { result: "Thundara", s1: "Thunder", s2: "Stun Edge", type: "K" },
             { result: "Thundara", s1: "Thunder", s2: "Thunder", type: "I" },
             { result: "Thundara", s1: "Zero Gravity", s2: "Magnet", type: "L" },
             { result: "Thundaga", s1: "Thundara", s2: "Binding Strike", type: "K" },
             { result: "Thundaga", s1: "Thundara", s2: "Thunder", type: "I" },
+            { result: "Thundaga", s1: "Thundara", s2: "Thundara", type: "J" },
             { result: "Thundaga Shot", s1: "Thundaga", s2: "Strike Raid", type: "I" },
             { result: "Thundaga Shot", s1: "Thundaga", s2: "Freeze Raid", type: "E" },
+            { result: "Thundaga Shot", s1: "Thundaga", s2: "Firaga", type: "A" },
             { result: "Cura", s1: "Cure", s2: "Thunder", type: "I" },
             { result: "Cura", s1: "Cure", s2: "Cure", type: "M" },
+            { result: "Cura", s1: "Cure", s2: "Aero", type: "O" },
             { result: "Curaga", s1: "Cura", s2: "Cure", type: "M" },
+            { result: "Curaga", s1: "Cura", s2: "Cura", type: "N" },
             { result: "Mine Shield", s1: "Fira", s2: "Zero Gravity", type: "A" },
             { result: "Mine Shield", s1: "Ignite", s2: "Stop", type: "D" },
+            { result: "Mine Shield", s1: "Block", s2: "Fira", type: "C" },
+            { result: "Mine Shield", s1: "Block", s2: "Stopra", type: "M" },
             { result: "Mine Square", s1: "Fira", s2: "Stop", type: "A" },
             { result: "Mine Square", s1: "Aerora", s2: "Ignite", type: "D" },
+            { result: "Mine Square", s1: "Barrier", s2: "Fira", type: "C" },
+            { result: "Mine Square", s1: "Barrier", s2: "Stopra", type: "M" },
             { result: "Seeker Mine", s1: "Mine Shield", s2: "Mine Square", type: "B" },
+            { result: "Seeker Mine", s1: "Mine Shield", s2: "Magnega", type: "C" },
+            { result: "Seeker Mine", s1: "Mine Square", s2: "Magnega", type: "D" },
             { result: "Zero Gravira", s1: "Zero Gravity", s2: "Thunder", type: "I" },
             { result: "Zero Gravira", s1: "Zero Gravity", s2: "Zero Gravity", type: "M" },
+            { result: "Zero Gravira", s1: "Magnet", s2: "Aero", type: "P" },
             { result: "Zero Graviga", s1: "Zero Gravira", s2: "Thundara", type: "I" },
+            { result: "Zero Graviga", s1: "Zero Gravira", s2: "Zero Gravity", type: "M" },
+            { result: "Zero Graviga", s1: "Zero Gravira", s2: "Zero Gravira", type: "N" },
             { result: "Magnera", s1: "Magnet", s2: "Stun Edge", type: "K" },
             { result: "Magnera", s1: "Magnet", s2: "Thunder", type: "I" },
+            { result: "Magnera", s1: "Magnet", s2: "Magnet", type: "M" },
             { result: "Magnega", s1: "Magnera", s2: "Magnet", type: "I" },
+            { result: "Magnega", s1: "Magnera", s2: "Magnera", type: "J" },
             { result: "Munny Magnet", s1: "Magnera", s2: "Wishing Edge", type: "K" },
+            { result: "Munny Magnet", s1: "Magnera", s2: "Thundara", type: "I" },
             { result: "Energy Magnet", s1: "Magnera", s2: "Cure", type: "M" },
+            { result: "Energy Magnet", s1: "Magnera", s2: "Cura", type: "N" },
             { result: "D-Link Magnet", s1: "Magnera", s2: "Zero Gravira", type: "L" },
+            { result: "D-Link Magnet", s1: "Magnera", s2: "Stopra", type: "I" },
             { result: "Aerora", s1: "Aero", s2: "Quick Blitz", type: "G" },
             { result: "Aerora", s1: "Aero", s2: "Thunder", type: "I" },
             { result: "Aerora", s1: "Aero", s2: "Aero", type: "E" },
             { result: "Aeroga", s1: "Aerora", s2: "Quick Blitz", type: "O" },
             { result: "Aeroga", s1: "Aerora", s2: "Aero", type: "M" },
-            { result: "Warp", s1: "Zero Gravira", s2: "Thundara", type: "I" },
+            { result: "Aeroga", s1: "Aerora", s2: "Aerora", type: "N" },
+            { result: "Warp", s1: "Zero Gravira", s2: "Thundara", type: "I", rare: true },
+            { result: "Warp", s1: "Zero Gravira", s2: "Zero Gravity", type: "M", rare: true },
+            { result: "Warp", s1: "Zero Gravira", s2: "Zero Gravira", type: "N", rare: true },
+            { result: "Warp", s1: "Zero Gravity", s2: "Thunder", type: "I", rare: true },
+            { result: "Warp", s1: "Zero Gravity", s2: "Zero Gravity", type: "M", rare: true },
+            { result: "Warp", s1: "Magnet", s2: "Aero", type: "P", rare: true },
             { result: "Faith", s1: "Wind Raid", s2: "Break Time", type: "N" },
             { result: "Deep Freeze", s1: "Blizzaga", s2: "Freeze Raid", type: "G" },
+            { result: "Deep Freeze", s1: "Blizzaga", s2: "Binding Strike", type: "H" },
+            { result: "Deep Freeze", s1: "Blizzaga", s2: "Triple Blizzaga", type: "F" },
             { result: "Glacier", s1: "Deep Freeze", s2: "Blizzaga", type: "E" },
+            { result: "Glacier", s1: "Deep Freeze", s2: "Triple Blizzaga", type: "F" },
             { result: "Ice Barrage", s1: "Blizzaga", s2: "Mine Shield", type: "F" },
-            { result: "Firaga Burst", s1: "Fira", s2: "Aeroga", type: "A" },
+            { result: "Ice Barrage", s1: "Blizzaga", s2: "Mine Square", type: "H" },
+            { result: "Firaga Burst", s1: "Fira", s2: "Aeroga", type: "A", rare: true },
+            { result: "Firaga Burst", s1: "Firaga", s2: "Aerora", type: "A", rare: true },
+            { result: "Firaga Burst", s1: "Firaga", s2: "Aeroga", type: "B", rare: true },
+            { result: "Firaga Burst", s1: "Firaga", s2: "Slow", type: "A", rare: true },
+            { result: "Firaga Burst", s1: "Firaga", s2: "Stopra", type: "D", rare: true },
+            { result: "Firaga Burst", s1: "Firaga", s2: "Stopga", type: "B", rare: true },
             { result: "Raging Storm", s1: "Fission Firaga", s2: "Firaga Burst", type: "B" },
+            { result: "Raging Storm", s1: "Fira", s2: "Fire Dash", type: "D", rare: true },
+            { result: "Raging Storm", s1: "Fira", s2: "Fire", type: "A", rare: true },
+            { result: "Raging Storm", s1: "Fira", s2: "Fira", type: "B", rare: true },
+            { result: "Raging Storm", s1: "Fira", s2: "Firaga", type: "A", rare: true },
+            { result: "Raging Storm", s1: "Firaga", s2: "Blitz", type: "D", rare: true },
+            { result: "Raging Storm", s1: "Firaga", s2: "Firaga", type: "B", rare: true },
+            { result: "Raging Storm", s1: "Fire Surge", s2: "Cartwheel", type: "C", rare: true },
             { result: "Mega Flare", s1: "Fission Firaga", s2: "Crawling Fire", type: "B" },
             { result: "Quake", s1: "Brutal Blast", s2: "Zero Graviga", type: "B" },
+            { result: "Quake", s1: "Brutal Blast", s2: "Magnega", type: "C" },
+            { result: "Quake", s1: "Brutal Blast", s2: "Brutal Blast", type: "N", rare: true },
+            { result: "Quake", s1: "Stun Edge", s2: "Mine Shield", type: "O", rare: true },
+            { result: "Quake", s1: "Binding Strike", s2: "Mine Square", type: "L", rare: true },
             { result: "Meteor", s1: "Geo Impact", s2: "Quake", type: "B" },
+            { result: "Meteor", s1: "Brutal Blast", s2: "Zero Graviga", type: "B", rare: true },
+            { result: "Meteor", s1: "Brutal Blast", s2: "Magnega", type: "C", rare: true },
             { result: "Tornado", s1: "Magnega", s2: "Aeroga", type: "N" },
+            { result: "Tornado", s1: "Aerora", s2: "Quick Blitz", type: "O", rare: true },
+            { result: "Tornado", s1: "Aerora", s2: "Aero", type: "M", rare: true },
+            { result: "Tornado", s1: "Aerora", s2: "Aerora", type: "N", rare: true },
+            { result: "Tornado", s1: "Aero", s2: "Quick Blitz", type: "G", rare: true },
+            { result: "Tornado", s1: "Aero", s2: "Thunder", type: "I", rare: true },
+            { result: "Tornado", s1: "Aero", s2: "Aero", type: "E", rare: true },
             { result: "Transcendence", s1: "Magnet Spiral", s2: "Zero Graviga", type: "J" },
+            { result: "Mini", s1: "Magnega", s2: "Magnega", type: "J" },
             { result: "Mini", s1: "Magnega", s2: "Bind", type: "I" },
+            { result: "Mini", s1: "Magnera", s2: "Warp", type: "N" },
             { result: "Blackout", s1: "Zero Gravity", s2: "Confuse", type: "M" },
+            { result: "Blackout", s1: "Zero Gravira", s2: "Confuse", type: "N" },
+            { result: "Blackout", s1: "Zero Gravira", s2: "Poison", type: "P" },
+            { result: "Ignite", s1: "Bind", s2: "Fire", type: "A" },
+            { result: "Ignite", s1: "Bind", s2: "Fira", type: "C" },
+            { result: "Stopra", s1: "Slow", s2: "Slow", type: "L" },
+            { result: "Stopra", s1: "Slow", s2: "Stop", type: "K" },
+            { result: "Stopra", s1: "Stop", s2: "Stop", type: "I" },
+            { result: "Stopga", s1: "Stopra", s2: "Stop", type: "I" },
+            { result: "Stopga", s1: "Stopra", s2: "Stopra", type: "J" },
             { result: "Thunder Roll", s1: "Dodge Roll", s2: "Thunder Surge", type: "P" },
+            { result: "Thunder Roll", s1: "Dodge Roll", s2: "Thundaga", type: "L" },
+            { result: "Thunder Roll", s1: "Dodge Roll", s2: "Stun Block", type: "L" },
             { result: "Firewheel", s1: "Cartwheel", s2: "Fire Surge", type: "B" },
+            { result: "Firewheel", s1: "Cartwheel", s2: "Firaga", type: "B" },
+            { result: "Firewheel", s1: "Cartwheel", s2: "Fission Firaga", type: "C" },
             { result: "Ice Slide", s1: "Air Slide", s2: "Blizzard Edge", type: "F" },
+            { result: "Ice Slide", s1: "Air Slide", s2: "Blizzaga", type: "H" },
             { result: "Fire Glide", s1: "Glide", s2: "Fire Surge", type: "C" },
+            { result: "Fire Glide", s1: "Glide", s2: "Firaga", type: "B" },
             { result: "Homing Slide", s1: "Sliding Dash", s2: "Magnera", type: "P" },
+            { result: "Homing Slide", s1: "Sliding Dash", s2: "Air Slide", type: "C" },
+            { result: "Homing Slide", s1: "Magnet", s2: "Air Slide", type: "L" },
             { result: "Renewal Block", s1: "Block", s2: "Curaga", type: "P" },
+            { result: "Renewal Block", s1: "Block", s2: "Esuna", type: "C" },
             { result: "Stun Block", s1: "Block", s2: "Stun Edge", type: "L" },
+            { result: "Stun Block", s1: "Block", s2: "Thundaga", type: "I" },
             { result: "Poison Block", s1: "Block", s2: "Poison Edge", type: "H" },
+            { result: "Poison Block", s1: "Block", s2: "Poison", type: "P" },
+            { result: "Renewal Barrier", s1: "Barrier", s2: "Curaga", type: "P" },
+            { result: "Renewal Barrier", s1: "Barrier", s2: "Esuna", type: "N" },
+            { result: "Confuse Barrier", s1: "Barrier", s2: "Confusion Strike", type: "C" },
+            { result: "Confuse Barrier", s1: "Barrier", s2: "Confuse", type: "L" },
+            { result: "Stop Barrier", s1: "Barrier", s2: "Stopga", type: "C" },
             { result: "Payback Fang", s1: "Sliding Dash", s2: "Counter Hammer", type: "P" },
-            { result: "Lightning Ray", s1: "Blitz", s2: "Air Slide", type: "I", rare: true },
-            { result: "Bio Barrage", s1: "Poison", s2: "Quick Blitz", type: "J", rare: true },
-            { result: "Stun Edge", s1: "Quick Blitz", s2: "Thunder", type: "K" },
-            { result: "Stun Edge", s1: "Sliding Dash", s2: "Thunder", type: "K" },
-            { result: "Sliding Dash", s1: "Quick Blitz", s2: "Blizzard", type: "G" },
-            { result: "Poison Edge", s1: "Quick Blitz", s2: "Poison", type: "O" },
-            { result: "Poison Edge", s1: "Sliding Dash", s2: "Poison", type: "K" },
-            { result: "Wishing Edge", s1: "Slot Edge", s2: "Barrier Surge", type: "P" },
-            { result: "Blizzard Edge", s1: "Quick Blitz", s2: "Blizzard", type: "G" },
-            { result: "Binding Strike", s1: "Quick Blitz", s2: "Bind", type: "K" }
+            { result: "Payback Raid", s1: "Sliding Dash", s2: "Strike Raid", type: "P" },
+            { result: "Payback Surge", s1: "Sliding Dash", s2: "Fire Surge", type: "C" },
+            { result: "Payback Surge", s1: "Sliding Dash", s2: "Thunder Surge", type: "L" },
+            { result: "Lightning Ray", s1: "Blitz", s2: "Air Slide", type: "-", rare: true },
+            { result: "Lightning Ray", s1: "Fire Dash", s2: "Thunder Surge", type: "-", rare: true },
+            { result: "Lightning Ray", s1: "Thundara", s2: "Binding Strike", type: "-", rare: true },
+            { result: "Lightning Ray", s1: "Thundara", s2: "Thunder", type: "-", rare: true },
+            { result: "Lightning Ray", s1: "Thundara", s2: "Thundara", type: "-", rare: true },
+            { result: "Lightning Ray", s1: "Blitz", s2: "Dark Haze", type: "-", rare: true },
+            { result: "Lightning Ray", s1: "Blitz", s2: "Aerial Slam", type: "-", rare: true },
+            { result: "Lightning Ray", s1: "Barrier Surge", s2: "Aeroga", type: "-", rare: true },
+            { result: "Meteor Shower", s1: "Blitz", s2: "Zero Graviga", type: "-", rare: true },
+            { result: "Meteor Shower", s1: "Thundaga", s2: "Strike Raid", type: "-", rare: true },
+            { result: "Meteor Shower", s1: "Thundaga", s2: "Freeze Raid", type: "-", rare: true },
+            { result: "Meteor Shower", s1: "Thundaga", s2: "Firaga", type: "-", rare: true },
+            { result: "Bio Barrage", s1: "Poison", s2: "Quick Blitz", type: "-", rare: true },
+            { result: "Bio Barrage", s1: "Poison", s2: "Sliding Dash", type: "-", rare: true },
+            { result: "Bio Barrage", s1: "Poison", s2: "Strike Raid", type: "-", rare: true },
+            { result: "Bio Barrage", s1: "Poison", s2: "Block", type: "-", rare: true },
+            { result: "Bio Barrage", s1: "Poison Edge", s2: "Block", type: "-", rare: true }
         ];
 
         const UNIQUE_COMMANDS = Array.from(new Set(RECIPES.flatMap(r => [r.s1, r.s2]))).sort();
+
+        // --- CATEGORY LISTS ---
+        const ATTACK_CMDS = new Set([
+            "Blitz", "Meteor Crash", "Fire Strike", "Magic Hour", "Barrier Surge", "Fire Dash", "Confusion Strike",
+            "Fire Surge", "Sonic Blade", "Chaos Blade", "Zantetsuken", "Strike Raid", "Freeze Raid", "Treasure Raid",
+            "Spark Raid", "Wind Raid", "Ars Solum", "Ars Arcanum", "Time Splicer", "Magnet Spiral", "Tornado Strike",
+            "Geo Impact", "Sacrifice", "Break Time", "Slot Edge", "Stun Edge", "Quick Blitz", "Sliding Dash",
+            "Poison Edge", "Wishing Edge", "Blizzard Edge", "Binding Strike", "Brutal Blast"
+        ]);
+
+        const MAGIC_CMDS = new Set([
+            "Fira", "Firaga", "Dark Firaga", "Fission Firaga", "Triple Firaga", "Crawling Fire",
+            "Blizzara", "Blizzaga", "Triple Blizzaga", "Thundara", "Thundaga", "Thundaga Shot",
+            "Cura", "Curaga", "Mine Shield", "Mine Square", "Seeker Mine", "Zero Gravira", "Zero Graviga",
+            "Magnera", "Magnega", "Munny Magnet", "Energy Magnet", "D-Link Magnet",
+            "Aerora", "Aeroga", "Warp", "Faith", "Deep Freeze", "Glacier", "Ice Barrage",
+            "Firaga Burst", "Raging Storm", "Mega Flare", "Quake", "Meteor", "Tornado", "Transcendence", "Mini",
+            "Blackout", "Zero Gravity", "Magnet", "Aero", "Blizzard", "Fire", "Thunder", "Stop", "Slow", "Confuse", "Poison", "Sleep", "Ignite"
+        ]);
+
+        const ACTION_CMDS = new Set([
+            "Thunder Roll", "Firewheel", "Ice Slide", "Fire Glide", "Homing Slide",
+            "Renewal Block", "Stun Block", "Poison Block", "Payback Fang", "Renewal Barrier", "Confuse Barrier", "Stop Barrier", "Payback Raid", "Payback Surge",
+            "Dodge Roll", "Cartwheel", "Air Slide", "Glide", "Block", "Counter Hammer"
+        ]);
+
+        const SHOTLOCK_CMDS = new Set([
+            "Bio Barrage", "Lightning Ray", "Meteor Shower"
+        ]);
 
         // --- ELEMENTS ---
         const slot1Input = document.getElementById('slot1');
@@ -292,9 +500,31 @@
 
         // --- LOGIC ---
 
+        function getCommandInfo(name) {
+            const cmd = UNIQUE_COMMANDS.find(c => c.toLowerCase() === name.toLowerCase()) || name;
+            if (ATTACK_CMDS.has(cmd)) return { icon: 'swords', color: 'text-orange-400' };
+            if (MAGIC_CMDS.has(cmd)) return { icon: 'wand-sparkles', color: 'text-purple-400' };
+            if (ACTION_CMDS.has(cmd)) return { icon: 'shield', color: 'text-yellow-400' };
+            if (SHOTLOCK_CMDS.has(cmd)) return { icon: 'crosshair', color: 'text-green-400' };
+            return { icon: 'circle-dashed', color: 'text-slate-500' };
+        }
+        function updateIcon(id, info) {
+            const oldIcon = document.getElementById(id);
+            if (!oldIcon) return;
+            const newIcon = document.createElement('i');
+            newIcon.id = id;
+            newIcon.className = `w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 transition-colors ${info.color}`;
+            newIcon.setAttribute('data-lucide', info.icon);
+            oldIcon.parentNode.replaceChild(newIcon, oldIcon);
+            lucide.createIcons();
+        }
+
         function calculate() {
             const s1 = slot1Input.value.trim().toLowerCase();
             const s2 = slot2Input.value.trim().toLowerCase();
+
+            updateIcon('icon-slot1', getCommandInfo(s1));
+            updateIcon('icon-slot2', getCommandInfo(s2));
 
             // Toggle clear buttons
             clear1Btn.classList.toggle('hidden', slot1Input.value === '');
@@ -331,6 +561,34 @@
 
                     const rareBadge = res.rare ? `<span class="px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">Rare Recipe</span>` : '';
 
+                    // Determine Style based on Category
+                    let iconName = "zap"; // Default
+                    let iconColor = "text-blue-400";
+                    let bgColor = "bg-blue-500/10";
+                    let borderColor = "border-blue-500/30";
+
+                    if (ATTACK_CMDS.has(res.result)) {
+                        iconName = "swords"; // Used "swords" as safe fallback for key-square
+                        iconColor = "text-orange-400";
+                        bgColor = "bg-orange-500/10";
+                        borderColor = "border-orange-500/30";
+                    } else if (MAGIC_CMDS.has(res.result)) {
+                        iconName = "wand-sparkles";
+                        iconColor = "text-purple-400";
+                        bgColor = "bg-purple-500/10";
+                        borderColor = "border-purple-500/30";
+                    } else if (ACTION_CMDS.has(res.result)) {
+                        iconName = "shield";
+                        iconColor = "text-yellow-400";
+                        bgColor = "bg-yellow-500/10";
+                        borderColor = "border-yellow-500/30";
+                    } else if (SHOTLOCK_CMDS.has(res.result)) {
+                        iconName = "crosshair";
+                        iconColor = "text-green-400";
+                        bgColor = "bg-green-500/10";
+                        borderColor = "border-green-500/30";
+                    }
+
                     let abilitiesHtml = '';
                     if (ABILITY_MATRIX[res.type]) {
                         Object.entries(ABILITY_MATRIX[res.type]).forEach(([crystal, ability]) => {
@@ -353,8 +611,8 @@
                     card.innerHTML = `
                         <div class="p-6 md:p-8 flex flex-col md:flex-row items-center md:items-start justify-between gap-6 border-b border-slate-700/50">
                             <div class="flex items-center gap-4">
-                                <div class="w-16 h-16 bg-blue-500/10 rounded-2xl flex items-center justify-center border border-blue-500/30 shadow-[0_0_30px_rgba(59,130,246,0.15)]">
-                                    <i data-lucide="zap" class="w-8 h-8 text-blue-400"></i>
+                                <div class="w-16 h-16 ${bgColor} rounded-2xl flex items-center justify-center border ${borderColor} shadow-lg">
+                                    <i data-lucide="${iconName}" class="w-8 h-8 ${iconColor}"></i>
                                 </div>
                                 <div>
                                     <h2 class="text-3xl font-bold text-white mb-1">${res.result}</h2>
