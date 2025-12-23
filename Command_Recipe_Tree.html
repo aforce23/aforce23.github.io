@@ -4,17 +4,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KHBBS Command Meld</title>
-    <link rel="icon" type="image/x-icon" href="/favicon.ico">
-
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>KHBBS Recipe Tree</title>
 
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
-
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 
     <style>
         :root {
@@ -58,14 +51,100 @@
             --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
             --glow-blue: 0 0 15px rgba(59, 130, 246, 0.3);
         }
-        
-        body {
-            font-family: 'Inter', sans-serif;
+
+        * {
+            box-sizing: border-box;
         }
 
-        .gap-4 { gap: 1rem; }
-        .items-center { align-items: center; }
-        .flex { display: flex; }
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background-color: var(--slate-900);
+            color: var(--slate-100);
+            margin: 0;
+            min-height: 100vh;
+            padding-bottom: 3rem;
+        }
+
+        /* Utilities */
+        .hidden {
+            display: none !important;
+        }
+
+        .flex {
+            display: flex;
+        }
+
+        .items-center {
+            align-items: center;
+        }
+
+        .justify-between {
+            justify-content: space-between;
+        }
+
+        .justify-center {
+            justify-content: center;
+        }
+
+        .gap-2 {
+            gap: 0.5rem;
+        }
+
+        .gap-4 {
+            gap: 1rem;
+        }
+
+        .w-full {
+            width: 100%;
+        }
+
+        .relative {
+            position: relative;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        /* Text Colors */
+        .text-blue-100 {
+            color: var(--blue-100);
+        }
+
+        .text-blue-400 {
+            color: var(--blue-400);
+        }
+
+        .text-slate-400 {
+            color: var(--slate-400);
+        }
+
+        .text-slate-500 {
+            color: var(--slate-500);
+        }
+
+        /* Header */
+        header {
+            background-color: var(--slate-950);
+            border-bottom: 1px solid var(--slate-800);
+            padding: 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .container {
+            max-width: 56rem;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        .logo-box {
+            background-color: var(--blue-600);
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+        }
 
         /* Menu Button */
         .menu-btn {
@@ -82,7 +161,7 @@
             align-items: center;
             gap: 0.5rem;
         }
-        
+
         .menu-btn:hover {
             background-color: var(--blue-600);
             border-color: var(--blue-500);
@@ -90,25 +169,385 @@
             box-shadow: var(--glow-blue);
         }
 
-        /* Custom scrollbar for suggestions */
-        .suggestions-list::-webkit-scrollbar {
-            width: 8px;
+        /* Input Section */
+        .search-section {
+            padding: 2rem 0;
+            max-width: 32rem;
+            margin: 0 auto;
         }
 
-        .suggestions-list::-webkit-scrollbar-track {
-            background: #1e293b;
+        .input-label {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--blue-400);
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+            margin-left: 0.25rem;
         }
 
-        .suggestions-list::-webkit-scrollbar-thumb {
-            background: #475569;
-            border-radius: 4px;
+        .command-input {
+            width: 100%;
+            background-color: var(--slate-800);
+            border: 2px solid var(--slate-700);
+            border-radius: 0.75rem;
+            padding: 1rem 1rem 1rem 3rem;
+            font-size: 1.125rem;
+            color: var(--slate-100);
+            transition: all 0.2s;
+            outline: none;
         }
 
-        .suggestions-list::-webkit-scrollbar-thumb:hover {
-            background: #64748b;
+        .command-input:focus {
+            border-color: var(--blue-500);
+            box-shadow: var(--glow-blue);
         }
 
-        /* Fade in animation */
+        .input-icon {
+            position: absolute;
+            left: 1rem;
+            top: 2.5rem;
+            /* adjusted for label */
+            color: var(--slate-500);
+            pointer-events: none;
+        }
+
+        /* Suggestions */
+        .suggestions-list {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            width: 100%;
+            background-color: var(--slate-800);
+            border: 1px solid var(--slate-700);
+            border-radius: 0.5rem;
+            margin-top: 0.25rem;
+            max-height: 15rem;
+            overflow-y: auto;
+            z-index: 50;
+            box-shadow: var(--shadow-xl);
+        }
+
+        .suggestion-item {
+            width: 100%;
+            text-align: left;
+            padding: 0.5rem 1rem;
+            background: none;
+            border: none;
+            border-bottom: 1px solid rgba(51, 65, 85, 0.5);
+            color: var(--slate-300);
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .suggestion-item:hover {
+            background-color: rgba(37, 99, 235, 0.2);
+            color: var(--blue-100);
+        }
+
+        /* Tree Visualization */
+        .tree-container {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .node-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: linear-gradient(to right, var(--slate-800), var(--slate-900));
+            border: 1px solid var(--slate-700);
+            border-radius: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .node-icon {
+            width: 3rem;
+            height: 3rem;
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .node-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: white;
+            margin: 0;
+        }
+
+        .node-subtitle {
+            font-size: 0.875rem;
+            color: var(--slate-400);
+            margin: 0;
+        }
+
+        /* Recipe Options */
+        .recipe-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            padding-left: 1rem;
+            border-left: 2px solid var(--slate-700);
+            margin-left: 1.5rem;
+        }
+
+        .recipe-card {
+            background-color: rgba(30, 41, 59, 0.5);
+            border: 1px solid var(--slate-700);
+            border-radius: 0.5rem;
+            /* overflow: hidden; Removed to allow tooltips to show */
+            position: relative;
+        }
+
+        .recipe-header {
+            padding: 0.75rem;
+            background-color: var(--slate-800);
+            border-bottom: 1px solid var(--slate-700);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.875rem;
+            color: var(--slate-300);
+            border-radius: 0.5rem 0.5rem 0 0;
+        }
+
+        .recipe-ingredients {
+            padding: 1rem;
+            display: grid;
+            gap: 1rem;
+            /* Ensure content doesn't clip tooltips or floating elements */
+        }
+
+        @media (min-width: 640px) {
+            .recipe-ingredients {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        /* Recursive Details/Summary Styling */
+        details.ingredient-node {
+            width: 100%;
+            position: relative;
+            /* Anchor for floating children */
+        }
+
+        details.ingredient-node>summary {
+            list-style: none;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            background-color: var(--slate-800);
+            border: 1px solid var(--slate-700);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all 0.2s;
+        }
+
+        details.ingredient-node>summary:hover {
+            border-color: var(--blue-500);
+            background-color: var(--slate-700);
+        }
+
+        details.ingredient-node[open]>summary {
+            background-color: var(--blue-600);
+            border-color: var(--blue-500);
+            color: white;
+        }
+
+        /* Floating Box Logic for Depth > 0 */
+        details.ingredient-node>.ingredient-children {
+            display: none;
+            /* Default hidden */
+            padding: 1rem;
+            background-color: var(--slate-900);
+            border: 1px solid var(--slate-600);
+            border-radius: 0.5rem;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
+
+            /* Floating positioning */
+            position: absolute;
+            top: calc(100% + 0.5rem);
+            left: 0;
+            z-index: 50;
+            min-width: 300px;
+            max-width: 90vw;
+        }
+
+        /* Show when open */
+        details.ingredient-node[open]>.ingredient-children {
+            display: block;
+            animation: fadeIn 0.2s ease-out;
+        }
+
+        /* Arrow for the floating box */
+        details.ingredient-node[open]>.ingredient-children::before {
+            content: '';
+            position: absolute;
+            top: -6px;
+            left: 1rem;
+            width: 10px;
+            height: 10px;
+            background-color: var(--slate-900);
+            border-top: 1px solid var(--slate-600);
+            border-left: 1px solid var(--slate-600);
+            transform: rotate(45deg);
+        }
+
+        .base-ingredient {
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            background-color: var(--slate-800);
+            border: 1px dashed var(--slate-600);
+            color: var(--slate-400);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        /* Tooltip Styles */
+        .type-badge-container {
+            position: relative;
+            display: inline-block;
+            cursor: help;
+        }
+
+        .type-badge {
+            background: var(--slate-700);
+            padding: 0.1rem 0.4rem;
+            border-radius: 0.25rem;
+            font-size: 0.75rem;
+            color: var(--slate-200);
+            border: 1px solid var(--slate-600);
+            transition: background-color 0.2s;
+        }
+
+        .type-badge-container:hover .type-badge {
+            background: var(--blue-600);
+            border-color: var(--blue-500);
+            color: white;
+        }
+
+        .tooltip-content {
+            visibility: hidden;
+            opacity: 0;
+            position: absolute;
+            bottom: 130%;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--slate-800);
+            border: 1px solid var(--slate-600);
+            color: var(--slate-200);
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            width: 280px;
+            /* Increased width for table */
+            text-align: left;
+            z-index: 70;
+            box-shadow: var(--shadow-xl);
+            pointer-events: none;
+            transition: opacity 0.2s, visibility 0.2s;
+        }
+
+        .type-badge-container:hover .tooltip-content {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .tooltip-title {
+            color: var(--blue-400);
+            font-weight: bold;
+            font-size: 0.8rem;
+            margin-bottom: 0.5rem;
+            display: block;
+            border-bottom: 1px solid var(--slate-700);
+            padding-bottom: 0.25rem;
+            text-align: center;
+        }
+
+        .tooltip-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.75rem;
+        }
+
+        .tooltip-table td {
+            padding: 3px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .tooltip-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .tooltip-table td:first-child {
+            color: var(--slate-400);
+        }
+
+        .tooltip-table td:last-child {
+            text-align: right;
+            color: var(--slate-100);
+            font-weight: 500;
+        }
+
+        .rare-badge {
+            color: var(--yellow-400);
+            font-size: 0.75rem;
+            border: 1px solid rgba(250, 204, 21, 0.3);
+            padding: 0.1rem 0.4rem;
+            border-radius: 0.25rem;
+            background: rgba(250, 204, 21, 0.1);
+        }
+
+        /* Dynamic Colors */
+        .text-orange-400 {
+            color: var(--orange-400);
+        }
+
+        .text-purple-400 {
+            color: var(--purple-400);
+        }
+
+        .text-yellow-400 {
+            color: var(--yellow-400);
+        }
+
+        .text-green-400 {
+            color: var(--green-400);
+        }
+
+        .bg-blue-soft {
+            background-color: var(--bg-blue-soft);
+            border-color: var(--border-blue-soft);
+        }
+
+        .bg-orange-soft {
+            background-color: var(--bg-orange-soft);
+            border-color: var(--border-orange-soft);
+        }
+
+        .bg-purple-soft {
+            background-color: var(--bg-purple-soft);
+            border-color: var(--border-purple-soft);
+        }
+
+        .bg-yellow-soft {
+            background-color: var(--bg-yellow-soft);
+            border-color: var(--border-yellow-soft);
+        }
+
+        .bg-green-soft {
+            background-color: var(--bg-green-soft);
+            border-color: var(--border-green-soft);
+        }
+
         @keyframes fadeIn {
             from {
                 opacity: 0;
@@ -120,120 +559,60 @@
                 transform: translateY(0);
             }
         }
-
-        .animate-fade-in {
-            animation: fadeIn 0.5s ease-out forwards;
-        }
     </style>
 </head>
 
-<body class="bg-slate-900 text-slate-100 min-h-screen pb-12 selection:bg-blue-500 selection:text-white">
+<body>
 
-    <!-- Header -->
-    <header class="bg-slate-950 border-b border-slate-800 p-4 shadow-lg sticky top-0 z-50">
-        <div class="max-w-4xl mx-auto flex items-center justify-between">
+    <header>
+        <div class="container flex items-center justify-between">
             <div class="flex items-center gap-3">
-                <div class="bg-blue-600 p-2 rounded-lg shadow-inner shadow-blue-400/20">
-                    <i data-lucide="crown" class="w-6 h-6 text-white"></i>
+                <div class="logo-box">
+                    <i data-lucide="git-branch" class="text-white" style="width: 24px; height: 24px;"></i>
                 </div>
                 <div>
-                    <h1 class="text-xl font-bold tracking-wide text-blue-100">Kingdom Hearts: Birth by Sleep</h1>
-                    <p class="text-xs text-slate-400 uppercase tracking-widest">Command Meld Calculator</p>
+                    <h1 class="text-xl font-bold tracking-wide text-blue-100">KHBBS Recipe Tree</h1>
+                    <p class="text-xs text-slate-400 uppercase tracking-widest">Reverse Lookup System</p>
                 </div>
-                <div class="flex items-center gap-4">
-                <a href="Command_Recipe_Tree.html" class="menu-btn">
-                    <i data-lucide="list-tree" style="width: 16px; height: 16px;"></i>
-                    Recipe Tree
+            </div>
+
+            <div class="flex items-center gap-4">
+                <a href="command_meld.html" class="menu-btn">
+                    <i data-lucide="calculator" style="width: 16px; height: 16px;"></i>
+                    Meld Calc
                 </a>
-                <a href="#" onclick="window.location.reload()" class="text-xs text-slate-500 hover:text-white transition-colors">Reset</a>
-                </div>
+                <a href="#" onclick="window.location.reload()"
+                    class="text-xs text-slate-500 hover:text-white transition-colors">Reset</a>
             </div>
         </div>
     </header>
 
-    <main class="max-w-4xl mx-auto p-4 md:p-6">
+    <main class="container">
 
-        <!-- Input Section -->
-        <div class="grid md:grid-cols-[1fr_auto_1fr] gap-4 items-end mb-8 relative">
-
-            <!-- Slot 1 -->
-            <div class="relative z-20">
-                <label class="block text-xs font-bold text-blue-400 uppercase mb-2 ml-1">Command Slot 1</label>
-                <div class="relative group">
-                    <input type="text" id="slot1" placeholder="e.g. Fire"
-                        class="w-full bg-slate-800 border-2 border-slate-700 rounded-xl p-4 pl-12 text-lg focus:outline-none focus:border-blue-500 focus:shadow-[0_0_15px_rgba(59,130,246,0.3)] transition-all placeholder:text-slate-600"
-                        autocomplete="off">
-                    <i id="icon-slot1" data-lucide="circle-dashed"
-                        class="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 transition-colors"></i>
-                    <button id="clear1"
-                        class="hidden absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white">
-                        <i data-lucide="x" class="w-4 h-4"></i>
-                    </button>
+        <!-- Search Section -->
+        <div class="search-section">
+            <div class="relative">
+                <label class="input-label">Target Command</label>
+                <input type="text" id="targetInput" placeholder="e.g. Mega Flare" class="command-input"
+                    autocomplete="off">
+                <div class="input-icon">
+                    <i data-lucide="search" style="width: 20px; height: 20px;"></i>
                 </div>
-                <!-- Suggestions 1 -->
-                <div id="suggestions1"
-                    class="hidden absolute top-full left-0 w-full bg-slate-800 border border-slate-700 rounded-lg mt-1 max-h-60 overflow-y-auto shadow-2xl z-50 suggestions-list">
-                </div>
+                <div id="suggestions" class="suggestions-list hidden"></div>
             </div>
-
-            <!-- Swap Button -->
-            <div class="flex justify-center mb-2">
-                <button id="swapBtn"
-                    class="p-3 bg-slate-800 hover:bg-slate-700 rounded-full border border-slate-700 text-slate-400 hover:text-blue-400 transition-all active:scale-95">
-                    <i data-lucide="arrow-right-left" class="w-5 h-5"></i>
-                </button>
-            </div>
-
-            <!-- Slot 2 -->
-            <div class="relative z-10">
-                <label class="block text-xs font-bold text-blue-400 uppercase mb-2 ml-1">Command Slot 2</label>
-                <div class="relative group">
-                    <input type="text" id="slot2" placeholder="e.g. Fire Dash"
-                        class="w-full bg-slate-800 border-2 border-slate-700 rounded-xl p-4 pl-12 text-lg focus:outline-none focus:border-blue-500 focus:shadow-[0_0_15px_rgba(59,130,246,0.3)] transition-all placeholder:text-slate-600"
-                        autocomplete="off">
-                    <i id="icon-slot2" data-lucide="circle-dashed"
-                        class="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 transition-colors"></i>
-                    <button id="clear2"
-                        class="hidden absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white">
-                        <i data-lucide="x" class="w-4 h-4"></i>
-                    </button>
-                </div>
-                <!-- Suggestions 2 -->
-                <div id="suggestions2"
-                    class="hidden absolute top-full left-0 w-full bg-slate-800 border border-slate-700 rounded-lg mt-1 max-h-60 overflow-y-auto shadow-2xl z-50 suggestions-list">
-                </div>
-            </div>
-
         </div>
 
-        <!-- Results Area -->
-        <div id="resultsContainer" class="space-y-6">
-            <!-- Dynamic content will be injected here -->
+        <!-- Tree Output -->
+        <div id="treeContainer" class="tree-container">
+            <div class="empty-state text-center" style="margin-top: 2rem;">
+                <p class="text-slate-500">Select a command above to view its recipe tree.</p>
+            </div>
         </div>
 
     </main>
 
     <script>
         // --- DATA ---
-        const ABILITY_MATRIX = {
-            A: { Shimmering: "Fire Boost", Fleeting: "Magic Haste", Pulsing: "Leaf Bracer", Wellspring: "Air Combo Plus", Soothing: "HP Boost", Hungry: "HP Prize Plus", Abounding: "Link Prize Plus" },
-            B: { Shimmering: "Fire Boost", Fleeting: "Reload Boost", Pulsing: "Finish Boost", Wellspring: "Once More", Soothing: "Damage Syphon", Hungry: "HP Prize Plus", Abounding: "EXP Chance" },
-            C: { Shimmering: "Fire Screen", Fleeting: "Attack Haste", Pulsing: "Finish Boost", Wellspring: "Combo Plus", Soothing: "HP Boost", Hungry: "HP Prize Plus", Abounding: "Link Prize Plus" },
-            D: { Shimmering: "Fire Screen", Fleeting: "Attack Haste", Pulsing: "Leaf Bracer", Wellspring: "Combo Plus", Soothing: "HP Boost", Hungry: "HP Prize Plus", Abounding: "Link Prize Plus" },
-            E: { Shimmering: "Blizzard Boost", Fleeting: "Magic Haste", Pulsing: "Leaf Bracer", Wellspring: "Combo Plus", Soothing: "Item Boost", Hungry: "HP Prize Plus", Abounding: "Lucky Strike" },
-            F: { Shimmering: "Blizzard Boost", Fleeting: "Reload Boost", Pulsing: "Second Chance", Wellspring: "Air Combo Plus", Soothing: "Damage Syphon", Hungry: "HP Prize Plus", Abounding: "Lucky Strike" },
-            G: { Shimmering: "Blizzard Screen", Fleeting: "Attack Haste", Pulsing: "Leaf Bracer", Wellspring: "Air Combo Plus", Soothing: "Item Boost", Hungry: "HP Prize Plus", Abounding: "Lucky Strike" },
-            H: { Shimmering: "Blizzard Screen", Fleeting: "Magic Haste", Pulsing: "Combo F Boost", Wellspring: "Air Combo Plus", Soothing: "Item Boost", Hungry: "HP Prize Plus", Abounding: "EXP Walker" },
-            I: { Shimmering: "Thunder Boost", Fleeting: "Magic Haste", Pulsing: "Combo F Boost", Wellspring: "Air Combo Plus", Soothing: "HP Boost", Hungry: "Treasure Magnet", Abounding: "Link Prize Plus" },
-            J: { Shimmering: "Thunder Boost", Fleeting: "Reload Boost", Pulsing: "Combo F Boost", Wellspring: "Once More", Soothing: "Defender", Hungry: "Treasure Magnet", Abounding: "EXP Chance" },
-            K: { Shimmering: "Thunder Screen", Fleeting: "Attack Haste", Pulsing: "Finish Boost", Wellspring: "Combo Plus", Soothing: "HP Boost", Hungry: "Treasure Magnet", Abounding: "Link Prize Plus" },
-            L: { Shimmering: "Thunder Screen", Fleeting: "Attack Haste", Pulsing: "Finish Boost", Wellspring: "Combo Plus", Soothing: "HP Boost", Hungry: "Treasure Magnet", Abounding: "Lucky Strike" },
-            M: { Shimmering: "Cure Boost", Fleeting: "Magic Haste", Pulsing: "Combo F Boost", Wellspring: "Combo Plus", Soothing: "Item Boost", Hungry: "Treasure Magnet", Abounding: "Lucky Strike" },
-            N: { Shimmering: "Cure Boost", Fleeting: "Reload Boost", Pulsing: "Second Chance", Wellspring: "Combo Plus", Soothing: "Defender", Hungry: "Treasure Magnet", Abounding: "Lucky Strike" },
-            O: { Shimmering: "Dark Screen", Fleeting: "Attack Haste", Pulsing: "Finish Boost", Wellspring: "Air Combo Plus", Soothing: "Item Boost", Hungry: "Treasure Magnet", Abounding: "Lucky Strike" },
-            P: { Shimmering: "Dark Screen", Fleeting: "Magic Haste", Pulsing: "Combo F Boost", Wellspring: "Air Combo Plus", Soothing: "Item Boost", Hungry: "Treasure Magnet", Abounding: "EXP Walker" }
-        };
-
         const RECIPES = [
             { result: "Blitz", s1: "Slot Edge", s2: "Quick Blitz", type: "O" },
             { result: "Blitz", s1: "Slot Edge", s2: "Stun Edge", type: "K" },
@@ -515,28 +894,49 @@
             { result: "Payback Raid", s1: "Sliding Dash", s2: "Strike Raid", type: "P" },
             { result: "Payback Surge", s1: "Sliding Dash", s2: "Fire Surge", type: "C" },
             { result: "Payback Surge", s1: "Sliding Dash", s2: "Thunder Surge", type: "L" },
-            { result: "Lightning Ray", s1: "Blitz", s2: "Air Slide", type: "-", rare: true },
-            { result: "Lightning Ray", s1: "Fire Dash", s2: "Thunder Surge", type: "-", rare: true },
-            { result: "Lightning Ray", s1: "Thundara", s2: "Binding Strike", type: "-", rare: true },
-            { result: "Lightning Ray", s1: "Thundara", s2: "Thunder", type: "-", rare: true },
-            { result: "Lightning Ray", s1: "Thundara", s2: "Thundara", type: "-", rare: true },
-            { result: "Lightning Ray", s1: "Blitz", s2: "Dark Haze", type: "-", rare: true },
-            { result: "Lightning Ray", s1: "Blitz", s2: "Aerial Slam", type: "-", rare: true },
-            { result: "Lightning Ray", s1: "Barrier Surge", s2: "Aeroga", type: "-", rare: true },
-            { result: "Meteor Shower", s1: "Blitz", s2: "Zero Graviga", type: "-", rare: true },
-            { result: "Meteor Shower", s1: "Thundaga", s2: "Strike Raid", type: "-", rare: true },
-            { result: "Meteor Shower", s1: "Thundaga", s2: "Freeze Raid", type: "-", rare: true },
-            { result: "Meteor Shower", s1: "Thundaga", s2: "Firaga", type: "-", rare: true },
-            { result: "Bio Barrage", s1: "Poison", s2: "Quick Blitz", type: "-", rare: true },
-            { result: "Bio Barrage", s1: "Poison", s2: "Sliding Dash", type: "-", rare: true },
-            { result: "Bio Barrage", s1: "Poison", s2: "Strike Raid", type: "-", rare: true },
-            { result: "Bio Barrage", s1: "Poison", s2: "Block", type: "-", rare: true },
-            { result: "Bio Barrage", s1: "Poison Edge", s2: "Block", type: "-", rare: true }
+            { result: "Lightning Ray", s1: "Blitz", s2: "Air Slide", type: "Z", rare: true },
+            { result: "Lightning Ray", s1: "Fire Dash", s2: "Thunder Surge", type: "Z", rare: true },
+            { result: "Lightning Ray", s1: "Thundara", s2: "Binding Strike", type: "Z", rare: true },
+            { result: "Lightning Ray", s1: "Thundara", s2: "Thunder", type: "Z", rare: true },
+            { result: "Lightning Ray", s1: "Thundara", s2: "Thundara", type: "Z", rare: true },
+            { result: "Lightning Ray", s1: "Blitz", s2: "Dark Haze", type: "Z", rare: true },
+            { result: "Lightning Ray", s1: "Blitz", s2: "Aerial Slam", type: "Z", rare: true },
+            { result: "Lightning Ray", s1: "Barrier Surge", s2: "Aeroga", type: "Z", rare: true },
+            { result: "Meteor Shower", s1: "Blitz", s2: "Zero Graviga", type: "Z", rare: true },
+            { result: "Meteor Shower", s1: "Thundaga", s2: "Strike Raid", type: "Z", rare: true },
+            { result: "Meteor Shower", s1: "Thundaga", s2: "Freeze Raid", type: "Z", rare: true },
+            { result: "Meteor Shower", s1: "Thundaga", s2: "Firaga", type: "Z", rare: true },
+            { result: "Bio Barrage", s1: "Poison", s2: "Quick Blitz", type: "Z", rare: true },
+            { result: "Bio Barrage", s1: "Poison", s2: "Sliding Dash", type: "Z", rare: true },
+            { result: "Bio Barrage", s1: "Poison", s2: "Strike Raid", type: "Z", rare: true },
+            { result: "Bio Barrage", s1: "Poison", s2: "Block", type: "Z", rare: true },
+            { result: "Bio Barrage", s1: "Poison Edge", s2: "Block", type: "Z", rare: true }
         ];
 
-        const UNIQUE_COMMANDS = Array.from(new Set(RECIPES.flatMap(r => [r.s1, r.s2]))).sort();
+        const UNIQUE_COMMANDS = Array.from(new Set(RECIPES.flatMap(r => [r.s1, r.s2, r.result]))).sort();
 
-        // --- CATEGORY LISTS ---
+        // --- TYPE ABILITIES MAPPING (KHBBS) ---
+        const ABILITY_MATRIX = {
+            A: { Shimmering: "Fire Boost", Fleeting: "Magic Haste", Pulsing: "Leaf Bracer", Wellspring: "Air Combo Plus", Soothing: "HP Boost", Hungry: "HP Prize Plus", Abounding: "Link Prize Plus" },
+            B: { Shimmering: "Fire Boost", Fleeting: "Reload Boost", Pulsing: "Finish Boost", Wellspring: "Once More", Soothing: "Damage Syphon", Hungry: "HP Prize Plus", Abounding: "EXP Chance" },
+            C: { Shimmering: "Fire Screen", Fleeting: "Attack Haste", Pulsing: "Finish Boost", Wellspring: "Combo Plus", Soothing: "HP Boost", Hungry: "HP Prize Plus", Abounding: "Link Prize Plus" },
+            D: { Shimmering: "Fire Screen", Fleeting: "Attack Haste", Pulsing: "Leaf Bracer", Wellspring: "Combo Plus", Soothing: "HP Boost", Hungry: "HP Prize Plus", Abounding: "Link Prize Plus" },
+            E: { Shimmering: "Blizzard Boost", Fleeting: "Magic Haste", Pulsing: "Leaf Bracer", Wellspring: "Combo Plus", Soothing: "Item Boost", Hungry: "HP Prize Plus", Abounding: "Lucky Strike" },
+            F: { Shimmering: "Blizzard Boost", Fleeting: "Reload Boost", Pulsing: "Second Chance", Wellspring: "Air Combo Plus", Soothing: "Damage Syphon", Hungry: "HP Prize Plus", Abounding: "Lucky Strike" },
+            G: { Shimmering: "Blizzard Screen", Fleeting: "Attack Haste", Pulsing: "Leaf Bracer", Wellspring: "Air Combo Plus", Soothing: "Item Boost", Hungry: "HP Prize Plus", Abounding: "Lucky Strike" },
+            H: { Shimmering: "Blizzard Screen", Fleeting: "Magic Haste", Pulsing: "Combo F Boost", Wellspring: "Air Combo Plus", Soothing: "Item Boost", Hungry: "HP Prize Plus", Abounding: "EXP Walker" },
+            I: { Shimmering: "Thunder Boost", Fleeting: "Magic Haste", Pulsing: "Combo F Boost", Wellspring: "Air Combo Plus", Soothing: "HP Boost", Hungry: "Treasure Magnet", Abounding: "Link Prize Plus" },
+            J: { Shimmering: "Thunder Boost", Fleeting: "Reload Boost", Pulsing: "Combo F Boost", Wellspring: "Once More", Soothing: "Defender", Hungry: "Treasure Magnet", Abounding: "EXP Chance" },
+            K: { Shimmering: "Thunder Screen", Fleeting: "Attack Haste", Pulsing: "Finish Boost", Wellspring: "Combo Plus", Soothing: "HP Boost", Hungry: "Treasure Magnet", Abounding: "Link Prize Plus" },
+            L: { Shimmering: "Thunder Screen", Fleeting: "Attack Haste", Pulsing: "Finish Boost", Wellspring: "Combo Plus", Soothing: "HP Boost", Hungry: "Treasure Magnet", Abounding: "Lucky Strike" },
+            M: { Shimmering: "Cure Boost", Fleeting: "Magic Haste", Pulsing: "Combo F Boost", Wellspring: "Combo Plus", Soothing: "Item Boost", Hungry: "Treasure Magnet", Abounding: "Lucky Strike" },
+            N: { Shimmering: "Cure Boost", Fleeting: "Reload Boost", Pulsing: "Second Chance", Wellspring: "Combo Plus", Soothing: "Defender", Hungry: "Treasure Magnet", Abounding: "Lucky Strike" },
+            O: { Shimmering: "Dark Screen", Fleeting: "Attack Haste", Pulsing: "Finish Boost", Wellspring: "Air Combo Plus", Soothing: "Item Boost", Hungry: "Treasure Magnet", Abounding: "Lucky Strike" },
+            P: { Shimmering: "Dark Screen", Fleeting: "Magic Haste", Pulsing: "Combo F Boost", Wellspring: "Air Combo Plus", Soothing: "Item Boost", Hungry: "Treasure Magnet", Abounding: "EXP Walker" },
+            Z: { Shimmering: "Dark Screen", Fleeting: "Magic Haste", Pulsing: "Combo F Boost", Wellspring: "Air Combo Plus", Soothing: "Item Boost", Hungry: "Treasure Magnet", Abounding: "EXP Walker" }
+        };
+
+        // --- CATEGORIES ---
         const ATTACK_CMDS = new Set([
             "Blitz", "Meteor Crash", "Fire Strike", "Magic Hour", "Barrier Surge", "Fire Dash", "Dark Haze", "Confusion Strike",
             "Fire Surge", "Sonic Blade", "Chaos Blade", "Zantetsuken", "Strike Raid", "Freeze Raid", "Treasure Raid",
@@ -564,234 +964,212 @@
         ]);
 
         // --- ELEMENTS ---
-        const slot1Input = document.getElementById('slot1');
-        const slot2Input = document.getElementById('slot2');
-        const clear1Btn = document.getElementById('clear1');
-        const clear2Btn = document.getElementById('clear2');
-        const suggestions1 = document.getElementById('suggestions1');
-        const suggestions2 = document.getElementById('suggestions2');
-        const swapBtn = document.getElementById('swapBtn');
-        const resultsContainer = document.getElementById('resultsContainer');
+        const targetInput = document.getElementById('targetInput');
+        const suggestions = document.getElementById('suggestions');
+        const treeContainer = document.getElementById('treeContainer');
 
-        // --- LOGIC ---
-
+        // --- HELPERS ---
         function getCommandInfo(name) {
             const cmd = UNIQUE_COMMANDS.find(c => c.toLowerCase() === name.toLowerCase()) || name;
-            if (ATTACK_CMDS.has(cmd)) return { icon: 'swords', color: 'text-orange-400' };
-            if (MAGIC_CMDS.has(cmd)) return { icon: 'wand-sparkles', color: 'text-purple-400' };
-            if (ACTION_CMDS.has(cmd)) return { icon: 'shield', color: 'text-yellow-400' };
-            if (SHOTLOCK_CMDS.has(cmd)) return { icon: 'crosshair', color: 'text-green-400' };
-            return { icon: 'circle-dashed', color: 'text-slate-500' };
-        }
-        function updateIcon(id, info) {
-            const oldIcon = document.getElementById(id);
-            if (!oldIcon) return;
-            const newIcon = document.createElement('i');
-            newIcon.id = id;
-            newIcon.className = `w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 transition-colors ${info.color}`;
-            newIcon.setAttribute('data-lucide', info.icon);
-            oldIcon.parentNode.replaceChild(newIcon, oldIcon);
-            lucide.createIcons();
+            if (ATTACK_CMDS.has(cmd)) return { icon: 'swords', color: 'text-orange-400', bg: 'bg-orange-soft' };
+            if (MAGIC_CMDS.has(cmd)) return { icon: 'wand-sparkles', color: 'text-purple-400', bg: 'bg-purple-soft' };
+            if (ACTION_CMDS.has(cmd)) return { icon: 'shield', color: 'text-yellow-400', bg: 'bg-yellow-soft' };
+            if (SHOTLOCK_CMDS.has(cmd)) return { icon: 'crosshair', color: 'text-green-400', bg: 'bg-green-soft' };
+            return { icon: 'circle-dashed', color: 'text-slate-500', bg: 'bg-slate-800' };
         }
 
-        function calculate() {
-            const s1 = slot1Input.value.trim().toLowerCase();
-            const s2 = slot2Input.value.trim().toLowerCase();
+        // --- RECURSIVE RENDERER ---
 
-            updateIcon('icon-slot1', getCommandInfo(s1));
-            updateIcon('icon-slot2', getCommandInfo(s2));
+        const MAX_DEPTH = 2; // Maximum recursion depth to prevent stack overflow
 
-            // Toggle clear buttons
-            clear1Btn.classList.toggle('hidden', slot1Input.value === '');
-            clear2Btn.classList.toggle('hidden', slot2Input.value === '');
+        function renderNode(commandName, depth = 0) {
+            const recipes = RECIPES.filter(r => r.result.toLowerCase() === commandName.toLowerCase());
+            const info = getCommandInfo(commandName);
 
-            if (!s1 || !s2) {
-                resultsContainer.innerHTML = '';
-                return;
-            }
-
-            const found = RECIPES.filter(r =>
-                (r.s1.toLowerCase() === s1 && r.s2.toLowerCase() === s2) ||
-                (r.s1.toLowerCase() === s2 && r.s2.toLowerCase() === s1)
-            );
-
-            renderResults(found);
-        }
-
-        function renderResults(results) {
-            resultsContainer.innerHTML = '';
-
-            if (results.length === 0) {
-                resultsContainer.innerHTML = `
-                    <div class="text-center p-8 bg-slate-800/50 rounded-2xl border border-dashed border-slate-700 animate-fade-in">
-                        <i data-lucide="search" class="w-8 h-8 mx-auto text-slate-600 mb-2"></i>
-                        <p class="text-slate-400">No known recipe found for this combination.</p>
-                        <p class="text-sm text-slate-500 mt-1">Try reversing the inputs or checking command spelling.</p>
+            // Leaf Node Condition:
+            // 1. No recipes exist for this command
+            // 2. OR Max depth reached (we stop expanding here)
+            if (recipes.length === 0 || depth >= MAX_DEPTH) {
+                return `
+                    <div class="base-ingredient">
+                        <i data-lucide="${info.icon}" class="${info.color}" style="width: 16px; height: 16px;"></i>
+                        <span>${commandName}</span>
+                        ${recipes.length > 0 ? `<span class="text-xs text-slate-500 ml-auto border border-slate-700 px-1 rounded">Has Recipes</span>` : ''}
                     </div>
                 `;
-            } else {
-                results.forEach(res => {
-                    const card = document.createElement('div');
-                    card.className = "bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700 rounded-2xl overflow-hidden shadow-xl animate-fade-in";
+            }
 
-                    const rareBadge = res.rare ? `<span class="px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">Rare Recipe</span>` : '';
+            // Helper to generate tooltip HTML
+            function getTooltipHtml(type) {
+                const abilities = Object.entries(ABILITY_MATRIX[type]).map(([key, value]) => {
+                    return {
+                        category: key,    // This replaces "entry.c"
+                        details: value    // This contains all the sub-items (Shimmering, etc.)
+                    };
+                });
+                if (abilities.length === 0) return '';
 
-                    // Determine Style based on Category
-                    let iconName = "zap"; // Default
-                    let iconColor = "text-blue-400";
-                    let bgColor = "bg-blue-500/10";
-                    let borderColor = "border-blue-500/30";
+                let rows = abilities.map(entry => `
+                    <tr>
+                        <td>${entry.category}</td>
+                        <td>${entry.details}</td> 
+                    </tr>
+                `).join('');
 
-                    if (ATTACK_CMDS.has(res.result)) {
-                        iconName = "swords"; // Used "swords" as safe fallback for key-square
-                        iconColor = "text-orange-400";
-                        bgColor = "bg-orange-500/10";
-                        borderColor = "border-orange-500/30";
-                    } else if (MAGIC_CMDS.has(res.result)) {
-                        iconName = "wand-sparkles";
-                        iconColor = "text-purple-400";
-                        bgColor = "bg-purple-500/10";
-                        borderColor = "border-purple-500/30";
-                    } else if (ACTION_CMDS.has(res.result)) {
-                        iconName = "shield";
-                        iconColor = "text-yellow-400";
-                        bgColor = "bg-yellow-500/10";
-                        borderColor = "border-yellow-500/30";
-                    } else if (SHOTLOCK_CMDS.has(res.result)) {
-                        iconName = "crosshair";
-                        iconColor = "text-green-400";
-                        bgColor = "bg-green-500/10";
-                        borderColor = "border-green-500/30";
-                    }
+                return `
+                    <div class="tooltip-content">
+                        <span class="tooltip-title">Type ${type} Synthesis</span>
+                        <table class="tooltip-table">
+                            ${rows}
+                        </table>
+                    </div>
+                `;
+            }
 
-                    let abilitiesHtml = '';
-                    if (ABILITY_MATRIX[res.type]) {
-                        Object.entries(ABILITY_MATRIX[res.type]).forEach(([crystal, ability]) => {
-                            let colorClass = "text-slate-200";
-                            if (ability.includes("Fire")) colorClass = "text-red-300";
-                            else if (ability.includes("Combo")) colorClass = "text-gray-300";
-                            else if (ability.includes("Lucky")) colorClass = "text-amber-300";
-                            else if (ability.includes("Thunder") || ability.includes("Treasure")) colorClass = "text-yellow-300";
-                            else if (ability.includes("Blizzard") || ability.includes("Defender")) colorClass = "text-blue-300";
-                            else if (ability.includes("Magic")) colorClass = "text-purple-300";
-                            else if (ability.includes("Link")) colorClass = "text-cyan-300";
-                            else if (ability.includes("Reload")) colorClass = "text-rose-500";
-                            else if (ability.includes("HP") || ability.includes("HP") || ability.includes("Syphon") || ability.includes("Bracer") || ability.includes("Second") || ability.includes("Once")) colorClass = "text-emerald-300";
-
-
-                            abilitiesHtml += `
-                                <div class="flex items-center justify-between p-3 rounded-lg bg-slate-800 border border-slate-700/50 hover:border-slate-600 transition-colors">
-                                    <span class="text-slate-400 text-sm">${crystal}</span>
-                                    <span class="font-semibold text-sm ${colorClass}">${ability}</span>
-                                </div>
-                            `;
-                        });
-                    } else {
-                        abilitiesHtml = `<p class="text-slate-500 italic">No ability data available for Type ${res.type}</p>`;
-                    }
-
-                    card.innerHTML = `
-                        <div class="p-6 md:p-8 flex flex-col md:flex-row items-center md:items-start justify-between gap-6 border-b border-slate-700/50">
-                            <div class="flex items-center gap-4">
-                                <div class="w-16 h-16 ${bgColor} rounded-2xl flex items-center justify-center border ${borderColor} shadow-lg">
-                                    <i data-lucide="${iconName}" class="w-8 h-8 ${iconColor}"></i>
-                                </div>
-                                <div>
-                                    <h2 class="text-3xl font-bold text-white mb-1">${res.result}</h2>
-                                    <div class="flex gap-2 text-sm">
-                                        <span class="px-2 py-0.5 rounded bg-slate-700 text-slate-300 border border-slate-600">Type ${res.type}</span>
-                                        ${rareBadge}
-                                    </div>
-                                </div>
-                            </div>
+            // Root Node (Depth 0) - The Main Card
+            if (depth === 0) {
+                let html = `
+                    <div class="node-header">
+                        <div class="node-icon ${info.bg}">
+                            <i data-lucide="${info.icon}" class="${info.color}" style="width: 24px; height: 24px;"></i>
                         </div>
-                        <div class="p-6 bg-slate-900/50">
-                            <h3 class="text-sm font-bold uppercase text-slate-500 mb-4 flex items-center gap-2">
-                                <i data-lucide="sparkles" class="w-4 h-4"></i>
-                                Resulting Abilities by Crystal
-                            </h3>
-                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                                ${abilitiesHtml}
+                        <div>
+                            <h2 class="node-title">${commandName}</h2>
+                            <p class="node-subtitle">${recipes.length > 0 ? `${recipes.length} Recipe${recipes.length !== 1 ? 's' : ''} Available` : 'Base Command / Purchase Only'}</p>
+                        </div>
+                    </div>
+                `;
+
+                html += `<div class="recipe-list">`;
+                recipes.forEach(recipe => {
+                    html += `
+                        <div class="recipe-card">
+                            <div class="recipe-header">
+                                <span>
+                                    <div class="type-badge-container">
+                                        <span class="type-badge">Type ${recipe.type}</span>
+                                        ${getTooltipHtml(recipe.type)}
+                                    </div>
+                                    ${recipe.rare ? '<span class="rare-badge">Rare</span>' : ''}
+                                </span>
+                                <span class="text-xs text-slate-400">Recipe: ${recipe.s1} + ${recipe.s2}</span>
+                            </div>
+                            <div class="recipe-ingredients">
+                                ${renderNode(recipe.s1, depth + 1)}
+                                ${renderNode(recipe.s2, depth + 1)}
                             </div>
                         </div>
                     `;
-                    resultsContainer.appendChild(card);
+                });
+                html += `</div>`;
+                return html;
+            }
+
+            // Intermediate Node (Depth 1...MAX_DEPTH-1) - Expandable Details
+            const isOpen = '';
+
+            let html = `
+                <details class="ingredient-node" ${isOpen}>
+                    <summary>
+                        <span class="flex items-center gap-2">
+                            <i data-lucide="${info.icon}" class="${info.color}" style="width: 16px; height: 16px;"></i>
+                            <span class="font-semibold text-sm text-slate-200">${commandName}</span>
+                        </span>
+                        <span class="text-xs text-slate-500">${recipes.length} ways</span>
+                    </summary>
+                    <div class="ingredient-children">
+                        <div class="flex flex-col gap-2">
+            `;
+
+            recipes.forEach(recipe => {
+                html += `
+                    <div class="recipe-card">
+                        <div class="recipe-header">
+                            <span>
+                                <div class="type-badge-container">
+                                    <span class="type-badge">Type ${recipe.type}</span>
+                                    ${getTooltipHtml(recipe.type)}
+                                </div>
+                                ${recipe.rare ? '<span class="rare-badge">Rare</span>' : ''}
+                            </span>
+                        </div>
+                        <div class="recipe-ingredients">
+                            ${renderNode(recipe.s1, depth + 1)}
+                            ${renderNode(recipe.s2, depth + 1)}
+                        </div>
+                    </div>
+                `;
+            });
+
+            html += `
+                        </div>
+                    </div>
+                </details>
+            `;
+            return html;
+        }
+
+
+        // --- AUTOCOMPLETE & EVENTS ---
+
+        targetInput.addEventListener('input', () => {
+            const val = targetInput.value.toLowerCase();
+            suggestions.innerHTML = '';
+
+            if (!val) {
+                suggestions.classList.add('hidden');
+                return;
+            }
+
+            const matches = UNIQUE_COMMANDS.filter(c => c.toLowerCase().includes(val));
+
+            if (matches.length > 0) {
+                suggestions.classList.remove('hidden');
+                matches.forEach(match => {
+                    const btn = document.createElement('button');
+                    btn.className = "suggestion-item";
+                    btn.textContent = match;
+                    btn.addEventListener('click', () => {
+                        targetInput.value = match;
+                        suggestions.classList.add('hidden');
+                        generateTree(match);
+                    });
+                    suggestions.appendChild(btn);
+                });
+            } else {
+                suggestions.classList.add('hidden');
+            }
+        });
+
+        // Close suggestions on click outside
+        document.addEventListener('click', (e) => {
+            if (!targetInput.contains(e.target) && !suggestions.contains(e.target)) {
+                suggestions.classList.add('hidden');
+            }
+            // Close floating details if clicking outside (optional UX improvement)
+            if (!e.target.closest('details.ingredient-node')) {
+                document.querySelectorAll('details.ingredient-node[open]').forEach(el => {
+                    el.removeAttribute('open');
                 });
             }
+        });
+
+        function generateTree(commandName) {
+            // Find official casing
+            const officialName = UNIQUE_COMMANDS.find(c => c.toLowerCase() === commandName.toLowerCase()) || commandName;
+
+            const treeHTML = renderNode(officialName, 0);
+            treeContainer.innerHTML = treeHTML;
+
             lucide.createIcons();
         }
 
-        // --- AUTOCOMPLETE LOGIC ---
-
-        function setupAutocomplete(input, list) {
-            input.addEventListener('input', () => {
-                const val = input.value.toLowerCase();
-                list.innerHTML = '';
-                if (!val) {
-                    list.classList.add('hidden');
-                    calculate();
-                    return;
-                }
-
-                const matches = UNIQUE_COMMANDS.filter(c => c.toLowerCase().includes(val));
-
-                if (matches.length > 0) {
-                    list.classList.remove('hidden');
-                    matches.forEach(match => {
-                        const btn = document.createElement('button');
-                        btn.className = "w-full text-left px-4 py-2 hover:bg-blue-600/20 hover:text-blue-200 transition-colors border-b border-slate-700/50 last:border-0 text-slate-300";
-                        btn.textContent = match;
-                        btn.addEventListener('click', () => {
-                            input.value = match;
-                            list.classList.add('hidden');
-                            calculate();
-                        });
-                        list.appendChild(btn);
-                    });
-                } else {
-                    list.classList.add('hidden');
-                }
-                calculate();
-            });
-
-            input.addEventListener('focus', () => {
-                const val = input.value.toLowerCase();
-                if (val && list.children.length > 0) list.classList.remove('hidden');
-            });
-        }
-
-        setupAutocomplete(slot1Input, suggestions1);
-        setupAutocomplete(slot2Input, suggestions2);
-
-        // Click outside to close suggestions
-        document.addEventListener('click', (e) => {
-            if (!slot1Input.contains(e.target) && !suggestions1.contains(e.target)) {
-                suggestions1.classList.add('hidden');
+        // Handle Enter key
+        targetInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                generateTree(targetInput.value);
+                suggestions.classList.add('hidden');
             }
-            if (!slot2Input.contains(e.target) && !suggestions2.contains(e.target)) {
-                suggestions2.classList.add('hidden');
-            }
-        });
-
-        // --- BUTTONS ---
-
-        swapBtn.addEventListener('click', () => {
-            const temp = slot1Input.value;
-            slot1Input.value = slot2Input.value;
-            slot2Input.value = temp;
-            calculate();
-        });
-
-        clear1Btn.addEventListener('click', () => {
-            slot1Input.value = '';
-            calculate();
-            suggestions1.innerHTML = ''; // Clear suggestions
-        });
-
-        clear2Btn.addEventListener('click', () => {
-            slot2Input.value = '';
-            calculate();
-            suggestions2.innerHTML = ''; // Clear suggestions
         });
 
         // Initial Icon Load
