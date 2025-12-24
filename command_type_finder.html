@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Command Meld Calculator</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Inter:wght@300;400;600&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            min-height: 100vh;
+            color: #e2e8f0;
+        }
+
+        .kh-font {
+            font-family: 'Cinzel', serif;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #1e293b;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #475569;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="max-w-5xl mx-auto p-4 sm:p-6 lg:p-8">
+        <!-- Header -->
+        <header class="mb-8 text-center sm:text-left">
+            <h1
+                class="text-3xl sm:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500 kh-font mb-2">
+                Command Meld Matrix
+            </h1>
+            <p class="text-slate-400">
+                Select ingredients or a target Type to view melding results and attached abilities.
+            </p>
+        </header>
+
+        <!-- Filters -->
+        <div class="bg-slate-800/50 backdrop-blur border border-slate-700 rounded-2xl p-4 sm:p-6 mb-8 shadow-xl">
+            <div class="flex flex-col md:flex-row gap-4 items-end">
+
+                <!-- Type Selector -->
+                <div class="w-full md:w-1/3">
+                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
+                        Filter by Type
+                    </label>
+                    <div class="relative">
+                        <select id="filter-type"
+                            class="w-full bg-slate-900 border border-slate-600 text-white rounded-lg p-3 appearance-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition-all outline-none">
+                            <option value="">All Types</option>
+                            <!-- Options populated by JS -->
+                        </select>
+                        <div
+                            class="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none text-slate-400">
+                            <!-- Filter Icon -->
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Component Selector -->
+                <div class="w-full md:w-1/3">
+                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
+                        Filter by Ingredient
+                    </label>
+                    <div class="relative">
+                        <select id="filter-component"
+                            class="w-full bg-slate-900 border border-slate-600 text-white rounded-lg p-3 appearance-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition-all outline-none">
+                            <option value="">All Ingredients</option>
+                            <!-- Options populated by JS -->
+                        </select>
+                        <div
+                            class="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none text-slate-400">
+                            <!-- Filter Icon -->
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Clear Button -->
+                <div class="w-full md:w-auto">
+                    <button id="btn-clear"
+                        class="w-full md:w-auto px-6 py-3 rounded-lg font-medium transition-all flex items-center justify-center gap-2 bg-slate-700 text-slate-500 cursor-not-allowed border border-slate-600"
+                        disabled>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M18 6 6 18" />
+                            <path d="m6 6 18 18" />
+                        </svg>
+                        Clear
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Count -->
+        <div id="results-count" class="mb-4 text-slate-400 text-sm font-medium">
+            Found 0 recipes
+        </div>
+
+        <!-- Grid -->
+        <div id="recipe-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+            <!-- Cards populated by JS -->
+        </div>
+
+        <footer class="mt-12 text-center text-slate-600 text-xs py-8 border-t border-slate-800">
+            Ability Matrix & Recipe Data Visualization
+        </footer>
+    </div>
+
+    <script>
+        // --- DATA ---
+        const ABILITY_MATRIX = {
+            A: { Shimmering: "Fire Boost", Fleeting: "Magic Haste", Pulsing: "Leaf Bracer", Wellspring: "Air Combo Plus", Soothing: "HP Boost", Hungry: "HP Prize Plus", Abounding: "Link Prize Plus" },
+            B: { Shimmering: "Fire Boost", Fleeting: "Reload Boost", Pulsing: "Finish Boost", Wellspring: "Once More", Soothing: "Damage Syphon", Hungry: "HP Prize Plus", Abounding: "EXP Chance" },
+            C: { Shimmering: "Fire Screen", Fleeting: "Attack Haste", Pulsing: "Finish Boost", Wellspring: "Combo Plus", Soothing: "HP Boost", Hungry: "HP Prize Plus", Abounding: "Link Prize Plus" },
+            D: { Shimmering: "Fire Screen", Fleeting: "Attack Haste", Pulsing: "Leaf Bracer", Wellspring: "Combo Plus", Soothing: "HP Boost", Hungry: "HP Prize Plus", Abounding: "Link Prize Plus" },
+            E: { Shimmering: "Blizzard Boost", Fleeting: "Magic Haste", Pulsing: "Leaf Bracer", Wellspring: "Combo Plus", Soothing: "Item Boost", Hungry: "HP Prize Plus", Abounding: "Lucky Strike" },
+            F: { Shimmering: "Blizzard Boost", Fleeting: "Reload Boost", Pulsing: "Second Chance", Wellspring: "Air Combo Plus", Soothing: "Damage Syphon", Hungry: "HP Prize Plus", Abounding: "Lucky Strike" },
+            G: { Shimmering: "Blizzard Screen", Fleeting: "Attack Haste", Pulsing: "Leaf Bracer", Wellspring: "Air Combo Plus", Soothing: "Item Boost", Hungry: "HP Prize Plus", Abounding: "Lucky Strike" },
+            H: { Shimmering: "Blizzard Screen", Fleeting: "Magic Haste", Pulsing: "Combo F Boost", Wellspring: "Air Combo Plus", Soothing: "Item Boost", Hungry: "HP Prize Plus", Abounding: "EXP Walker" },
+            I: { Shimmering: "Thunder Boost", Fleeting: "Magic Haste", Pulsing: "Combo F Boost", Wellspring: "Air Combo Plus", Soothing: "HP Boost", Hungry: "Treasure Magnet", Abounding: "Link Prize Plus" },
+            J: { Shimmering: "Thunder Boost", Fleeting: "Reload Boost", Pulsing: "Combo F Boost", Wellspring: "Once More", Soothing: "Defender", Hungry: "Treasure Magnet", Abounding: "EXP Chance" },
+            K: { Shimmering: "Thunder Screen", Fleeting: "Attack Haste", Pulsing: "Finish Boost", Wellspring: "Combo Plus", Soothing: "HP Boost", Hungry: "Treasure Magnet", Abounding: "Link Prize Plus" },
+            L: { Shimmering: "Thunder Screen", Fleeting: "Attack Haste", Pulsing: "Finish Boost", Wellspring: "Combo Plus", Soothing: "HP Boost", Hungry: "Treasure Magnet", Abounding: "Lucky Strike" },
+            M: { Shimmering: "Cure Boost", Fleeting: "Magic Haste", Pulsing: "Combo F Boost", Wellspring: "Combo Plus", Soothing: "Item Boost", Hungry: "Treasure Magnet", Abounding: "Lucky Strike" },
+            N: { Shimmering: "Cure Boost", Fleeting: "Reload Boost", Pulsing: "Second Chance", Wellspring: "Combo Plus", Soothing: "Defender", Hungry: "Treasure Magnet", Abounding: "Lucky Strike" },
+            O: { Shimmering: "Dark Screen", Fleeting: "Attack Haste", Pulsing: "Finish Boost", Wellspring: "Air Combo Plus", Soothing: "Item Boost", Hungry: "Treasure Magnet", Abounding: "Lucky Strike" },
+            P: { Shimmering: "Dark Screen", Fleeting: "Magic Haste", Pulsing: "Combo F Boost", Wellspring: "Air Combo Plus", Soothing: "Item Boost", Hungry: "Treasure Magnet", Abounding: "EXP Walker" }
+        };
+
+        const RECIPES = [
+            { result: "Blitz", s1: "Slot Edge", s2: "Quick Blitz", type: "O" },
+            { result: "Blitz", s1: "Slot Edge", s2: "Stun Edge", type: "K" },
+            { result: "Blitz", s1: "Barrier Surge", s2: "Wishing Edge", type: "P" },
+            { result: "Meteor Crash", s1: "Blitz", s2: "Quake", type: "N" },
+            { result: "Meteor Crash", s1: "Fire Strike", s2: "Brutal Blast", type: "D" },
+            { result: "Magic Hour", s1: "Blitz", s2: "Zero Graviga", type: "O" },
+            { result: "Magic Hour", s1: "Barrier Surge", s2: "Aeroga", type: "N" },
+            { result: "Fire Dash", s1: "Sliding Dash", s2: "Fire", type: "D" },
+            { result: "Fire Dash", s1: "Sliding Dash", s2: "Fira", type: "C" },
+            { result: "Fire Dash", s1: "Confusion Strike", s2: "Fire", type: "D" },
+            { result: "Dark Haze", s1: "Fire Dash", s2: "Zero Gravira", type: "D" },
+            { result: "Dark Haze", s1: "Fire Dash", s2: "Blackout", type: "A" },
+            { result: "Dark Haze", s1: "Fire Surge", s2: "Zero Gravity", type: "C" },
+            { result: "Sonic Blade", s1: "Blitz", s2: "Air Slide", type: "N" },
+            { result: "Sonic Blade", s1: "Fire Dash", s2: "Thunder Surge", type: "K" },
+            { result: "Sonic Blade", s1: "Blitz", s2: "Dark Haze", type: "D" },
+            { result: "Chaos Blade", s1: "Dark Haze", s2: "Sonic Blade", type: "B" },
+            { result: "Zantetsuken", s1: "Stopga", s2: "Dark Haze", type: "B" },
+            { result: "Zantetsuken", s1: "Stopga", s2: "Sonic Blade", type: "F" },
+            { result: "Strike Raid", s1: "Quick Blitz", s2: "Sliding Dash", type: "O" },
+            { result: "Freeze Raid", s1: "Strike Raid", s2: "Blizzara", type: "I" },
+            { result: "Freeze Raid", s1: "Blizzard Edge", s2: "Binding Strike", type: "K" },
+            { result: "Treasure Raid", s1: "Slot Edge", s2: "Strike Raid", type: "O" },
+            { result: "Treasure Raid", s1: "Slot Edge", s2: "Magnet", type: "D" },
+            { result: "Treasure Raid", s1: "Slot Edge", s2: "Magnera", type: "K" },
+            { result: "Spark Raid", s1: "Magnega", s2: "Freeze Raid", type: "J" },
+            { result: "Spark Raid", s1: "Magnega", s2: "Treasure Raid", type: "N" },
+            { result: "Spark Raid", s1: "Dodge Roll", s2: "Thunder Surge", type: "P", rare: true },
+            { result: "Spark Raid", s1: "Dodge Roll", s2: "Thundaga", type: "L", rare: true },
+            { result: "Spark Raid", s1: "Dodge Roll", s2: "Stun Block", type: "L", rare: true },
+            { result: "Wind Raid", s1: "Aeroga", s2: "Freeze Raid", type: "B" },
+            { result: "Wind Raid", s1: "Aeroga", s2: "Treasure Raid", type: "F" },
+            { result: "Fire Surge", s1: "Fire Dash", s2: "Ignite", type: "D" },
+            { result: "Fire Surge", s1: "Fira", s2: "Fire Strike", type: "A" },
+            { result: "Fire Surge", s1: "Fira", s2: "Confusion Strike", type: "O" },
+            { result: "Fire Surge", s1: "Fira", s2: "Binding Strike", type: "K" },
+            { result: "Barrier Surge", s1: "Barrier", s2: "Fire Dash", type: "D" },
+            { result: "Barrier Surge", s1: "Barrier", s2: "Stun Edge", type: "K" },
+            { result: "Thunder Surge", s1: "Thundara", s2: "Fire Dash", type: "D" },
+            { result: "Thunder Surge", s1: "Thundara", s2: "Freeze Raid", type: "G" },
+            { result: "Thunder Surge", s1: "Thundara", s2: "Stun Edge", type: "I" },
+            { result: "Thunder Surge", s1: "Thundara", s2: "Confusion Strike", type: "I" },
+            { result: "Aerial Slam", s1: "Fire Dash", s2: "High Jump", type: "A" },
+            { result: "Aerial Slam", s1: "Fire Surge", s2: "Aero", type: "D" },
+            { result: "Aerial Slam", s1: "Fire Strike", s2: "Aerora", type: "C" },
+            { result: "Ars Solum", s1: "Dark Haze", s2: "Sonic Blade", type: "B", rare: true },
+            { result: "Ars Solum", s1: "Dark Haze", s2: "Stopga", type: "B", rare: true },
+            { result: "Ars Solum", s1: "Sonic Blade", s2: "Stopga", type: "K", rare: true },
+            { result: "Ars Solum", s1: "Thunder", s2: "Sliding Dash", type: "K", rare: true },
+            { result: "Ars Solum", s1: "Thunder", s2: "Strike Raid", type: "L", rare: true },
+            { result: "Ars Solum", s1: "Thundara", s2: "Strike Raid", type: "K", rare: true },
+            { result: "Ars Solum", s1: "Thundara", s2: "Confusion Strike", type: "I", rare: true },
+            { result: "Ars Arcanum", s1: "Blitz", s2: "Aerial Slam", type: "F" },
+            { result: "Ars Arcanum", s1: "Quick Blitz", s2: "Slot Edge", type: "O", rare: true },
+            { result: "Ars Arcanum", s1: "Quick Blitz", s2: "Blizzard", type: "G", rare: true },
+            { result: "Ars Arcanum", s1: "Quick Blitz", s2: "Blizzara", type: "H", rare: true },
+            { result: "Ars Arcanum", s1: "Sliding Dash", s2: "Blizzard", type: "E", rare: true },
+            { result: "Ars Arcanum", s1: "Sliding Dash", s2: "Blizzara", type: "G", rare: true },
+            { result: "Ars Arcanum", s1: "Cura", s2: "Poison Edge", type: "P", rare: true },
+            { result: "Ars Arcanum", s1: "Cura", s2: "Blizzard Edge", type: "G", rare: true },
+            { result: "Ars Arcanum", s1: "Fire Strike", s2: "Aerora", type: "C", rare: true },
+            { result: "Time Splicer", s1: "Aerial Slam", s2: "Stopga", type: "F" },
+            { result: "Time Splicer", s1: "Stun Edge", s2: "Slot Edge", type: "K", rare: true },
+            { result: "Time Splicer", s1: "Barrier Surge", s2: "Wishing Edge", type: "P", rare: true },
+            { result: "Time Splicer", s1: "Stopga", s2: "Barrier", type: "C", rare: true },
+            { result: "Poison Edge", s1: "Poison", s2: "Quick Blitz", type: "O" },
+            { result: "Poison Edge", s1: "Poison", s2: "Sliding Dash", type: "K" },
+            { result: "Poison Edge", s1: "Poison", s2: "Strike Raid", type: "D" },
+            { result: "Wishing Edge", s1: "Barrier Surge", s2: "Strike Raid", type: "O" },
+            { result: "Wishing Edge", s1: "Barrier Surge", s2: "Stun Edge", type: "K" },
+            { result: "Wishing Edge", s1: "Stun Edge", s2: "Binding Strike", type: "J" },
+            { result: "Blizzard Edge", s1: "Quick Blitz", s2: "Blizzard", type: "G" },
+            { result: "Blizzard Edge", s1: "Quick Blitz", s2: "Blizzara", type: "H" },
+            { result: "Blizzard Edge", s1: "Sliding Dash", s2: "Blizzard", type: "E" },
+            { result: "Blizzard Edge", s1: "Sliding Dash", s2: "Blizzara", type: "G" },
+            { result: "Stun Edge", s1: "Sliding Dash", s2: "Thunder", type: "K" },
+            { result: "Stun Edge", s1: "Strike Raid", s2: "Thunder", type: "L" },
+            { result: "Stun Edge", s1: "Strike Raid", s2: "Thundara", type: "K" },
+            { result: "Slot Edge", s1: "Cura", s2: "Poison Edge", type: "P" },
+            { result: "Slot Edge", s1: "Cura", s2: "Blizzard Edge", type: "G" },
+            { result: "Slot Edge", s1: "Curaga", s2: "Renewal Block", type: "N" },
+            { result: "Slot Edge", s1: "Curaga", s2: "Focus Block", type: "P" },
+            { result: "Slot Edge", s1: "Curaga", s2: "Renewal Barrier", type: "N" },
+            { result: "Slot Edge", s1: "Curaga", s2: "Focus Barrier", type: "P" },
+            { result: "Slot Edge", s1: "Wishing Edge", s2: "Cure", type: "O" },
+            { result: "Fire Strike", s1: "Poison Edge", s2: "Fira", type: "D" },
+            { result: "Fire Strike", s1: "Stun Edge", s2: "Fire", type: "K" },
+            { result: "Fire Strike", s1: "Wishing Edge", s2: "Ignite", type: "A" },
+            { result: "Confusion Strike", s1: "Confuse", s2: "Quick Blitz", type: "O" },
+            { result: "Confusion Strike", s1: "Confuse", s2: "Strike Raid", type: "G" },
+            { result: "Confusion Strike", s1: "Sliding Dash", s2: "Zero Gravity", type: "K" },
+            { result: "Binding Strike", s1: "Bind", s2: "Quick Blitz", type: "K" },
+            { result: "Binding Strike", s1: "Bind", s2: "Strike Raid", type: "O" },
+            { result: "Binding Strike", s1: "Stun Edge", s2: "Zero Gravity", type: "I" },
+            { result: "Brutal Blast", s1: "Stun Edge", s2: "Mine Shield", type: "O" },
+            { result: "Brutal Blast", s1: "Binding Strike", s2: "Mine Square", type: "L" },
+            { result: "Tornado Strike", s1: "Aeroga", s2: "Confusion Strike", type: "G" },
+            { result: "Tornado Strike", s1: "Aeroga", s2: "Binding Strike", type: "F" },
+            { result: "Magnet Spiral", s1: "Binding Strike", s2: "Collision Magnet", type: "K" },
+            { result: "Magnet Spiral", s1: "Binding Strike", s2: "Magnega", type: "J" },
+            { result: "Magnet Spiral", s1: "Magnera", s2: "Quick Blitz", type: "K", rare: true },
+            { result: "Magnet Spiral", s1: "Magnera", s2: "Stun Edge", type: "L", rare: true },
+            { result: "Magnet Spiral", s1: "Zero Gravira", s2: "Magnet", type: "I", rare: true },
+            { result: "Windcutter", s1: "Aeroga", s2: "Binding Strike", type: "F" },
+            { result: "Windcutter", s1: "Aeroga", s2: "Confusion Strike", type: "G" },
+            { result: "Limit Storm", s1: "Brutal Blast", s2: "Confusion Strike", type: "G" },
+            { result: "Limit Storm", s1: "Brutal Blast", s2: "Binding Strike", type: "D" },
+            { result: "Salvation", s1: "Wind Raid", s2: "Curaga", type: "N" },
+            { result: "Collision Magnet", s1: "Magnera", s2: "Quick Blitz", type: "K" },
+            { result: "Collision Magnet", s1: "Magnera", s2: "Stun Edge", type: "L" },
+            { result: "Collision Magnet", s1: "Zero Gravira", s2: "Magnet", type: "I" },
+            { result: "Geo Impact", s1: "Brutal Blast", s2: "Brutal Blast", type: "N" },
+            { result: "Sacrifice", s1: "Warp", s2: "Dark Haze", type: "B" },
+            { result: "Sacrifice", s1: "Warp", s2: "Poison Edge", type: "D" },
+            { result: "Break Time", s1: "Curaga", s2: "Renewal Block", type: "N", rare: true },
+            { result: "Break Time", s1: "Curaga", s2: "Focus Block", type: "P", rare: true },
+            { result: "Break Time", s1: "Curaga", s2: "Renewal Barrier", type: "N", rare: true },
+            { result: "Break Time", s1: "Curaga", s2: "Focus Barrier", type: "P", rare: true },
+            { result: "Fira", s1: "Fire", s2: "Fire Dash", type: "D" },
+            { result: "Fira", s1: "Fire", s2: "Fire Strike", type: "D" },
+            { result: "Fira", s1: "Fire", s2: "Fire", type: "A" },
+            { result: "Fira", s1: "Fire", s2: "Ignite", type: "C" },
+            { result: "Firaga", s1: "Fira", s2: "Fire Dash", type: "D" },
+            { result: "Firaga", s1: "Fira", s2: "Fire", type: "A" },
+            { result: "Firaga", s1: "Fira", s2: "Fira", type: "B" },
+            { result: "Dark Firaga", s1: "Firaga", s2: "Dark Haze", type: "D" },
+            { result: "Dark Firaga", s1: "Firaga", s2: "Blackout", type: "B" },
+            { result: "Fission Firaga", s1: "Fira", s2: "Aeroga", type: "A" },
+            { result: "Fission Firaga", s1: "Firaga", s2: "Aerora", type: "A" },
+            { result: "Fission Firaga", s1: "Firaga", s2: "Aeroga", type: "B" },
+            { result: "Triple Firaga", s1: "Firaga", s2: "Blitz", type: "D" },
+            { result: "Triple Firaga", s1: "Firaga", s2: "Fira", type: "A" },
+            { result: "Triple Firaga", s1: "Firaga", s2: "Firaga", type: "B" },
+            { result: "Crawling Fire", s1: "Firaga", s2: "Slow", type: "A" },
+            { result: "Crawling Fire", s1: "Firaga", s2: "Stopra", type: "D" },
+            { result: "Crawling Fire", s1: "Firaga", s2: "Stopga", type: "B" },
+            { result: "Blizzara", s1: "Blizzard", s2: "Strike Raid", type: "G" },
+            { result: "Blizzara", s1: "Blizzard", s2: "Blizzard Edge", type: "G" },
+            { result: "Blizzara", s1: "Blizzard", s2: "Blizzard", type: "E" },
+            { result: "Blizzara", s1: "Blizzard", s2: "Aero", type: "H" },
+            { result: "Blizzaga", s1: "Blizzara", s2: "Blizzard Edge", type: "G" },
+            { result: "Blizzaga", s1: "Blizzara", s2: "Blizzard", type: "E" },
+            { result: "Blizzaga", s1: "Blizzara", s2: "Blizzara", type: "F" },
+            { result: "Triple Blizzaga", s1: "Blizzaga", s2: "Blitz", type: "G" },
+            { result: "Triple Blizzaga", s1: "Blizzaga", s2: "Blizzara", type: "E" },
+            { result: "Triple Blizzaga", s1: "Blizzaga", s2: "Blizzaga", type: "F" },
+            { result: "Thundara", s1: "Thunder", s2: "Stun Edge", type: "K" },
+            { result: "Thundara", s1: "Thunder", s2: "Thunder", type: "I" },
+            { result: "Thundara", s1: "Zero Gravity", s2: "Magnet", type: "L" },
+            { result: "Thundaga", s1: "Thundara", s2: "Binding Strike", type: "K" },
+            { result: "Thundaga", s1: "Thundara", s2: "Thunder", type: "I" },
+            { result: "Thundaga", s1: "Thundara", s2: "Thundara", type: "J" },
+            { result: "Thundaga Shot", s1: "Thundaga", s2: "Strike Raid", type: "I" },
+            { result: "Thundaga Shot", s1: "Thundaga", s2: "Freeze Raid", type: "E" },
+            { result: "Thundaga Shot", s1: "Thundaga", s2: "Firaga", type: "A" },
+            { result: "Cura", s1: "Cure", s2: "Thunder", type: "I" },
+            { result: "Cura", s1: "Cure", s2: "Cure", type: "M" },
+            { result: "Cura", s1: "Cure", s2: "Aero", type: "O" },
+            { result: "Curaga", s1: "Cura", s2: "Cure", type: "M" },
+            { result: "Curaga", s1: "Cura", s2: "Cura", type: "N" },
+            { result: "Mine Shield", s1: "Fira", s2: "Zero Gravity", type: "A" },
+            { result: "Mine Shield", s1: "Ignite", s2: "Stop", type: "D" },
+            { result: "Mine Shield", s1: "Block", s2: "Fira", type: "C" },
+            { result: "Mine Shield", s1: "Block", s2: "Stopra", type: "M" },
+            { result: "Mine Square", s1: "Fira", s2: "Stop", type: "A" },
+            { result: "Mine Square", s1: "Aerora", s2: "Ignite", type: "D" },
+            { result: "Mine Square", s1: "Barrier", s2: "Fira", type: "C" },
+            { result: "Mine Square", s1: "Barrier", s2: "Stopra", type: "M" },
+            { result: "Seeker Mine", s1: "Mine Shield", s2: "Mine Square", type: "B" },
+            { result: "Seeker Mine", s1: "Mine Shield", s2: "Magnega", type: "C" },
+            { result: "Seeker Mine", s1: "Mine Square", s2: "Magnega", type: "D" },
+            { result: "Zero Gravira", s1: "Zero Gravity", s2: "Thunder", type: "I" },
+            { result: "Zero Gravira", s1: "Zero Gravity", s2: "Zero Gravity", type: "M" },
+            { result: "Zero Gravira", s1: "Magnet", s2: "Aero", type: "P" },
+            { result: "Zero Graviga", s1: "Zero Gravira", s2: "Thundara", type: "I" },
+            { result: "Zero Graviga", s1: "Zero Gravira", s2: "Zero Gravity", type: "M" },
+            { result: "Zero Graviga", s1: "Zero Gravira", s2: "Zero Gravira", type: "N" },
+            { result: "Magnera", s1: "Magnet", s2: "Stun Edge", type: "K" },
+            { result: "Magnera", s1: "Magnet", s2: "Thunder", type: "I" },
+            { result: "Magnera", s1: "Magnet", s2: "Magnet", type: "M" },
+            { result: "Magnega", s1: "Magnera", s2: "Magnet", type: "I" },
+            { result: "Magnega", s1: "Magnera", s2: "Magnera", type: "J" },
+            { result: "Munny Magnet", s1: "Magnera", s2: "Wishing Edge", type: "K" },
+            { result: "Munny Magnet", s1: "Magnera", s2: "Thundara", type: "I" },
+            { result: "Energy Magnet", s1: "Magnera", s2: "Cure", type: "M" },
+            { result: "Energy Magnet", s1: "Magnera", s2: "Cura", type: "N" },
+            { result: "D-Link Magnet", s1: "Magnera", s2: "Zero Gravira", type: "L" },
+            { result: "D-Link Magnet", s1: "Magnera", s2: "Stopra", type: "I" },
+            { result: "Aerora", s1: "Aero", s2: "Quick Blitz", type: "G" },
+            { result: "Aerora", s1: "Aero", s2: "Thunder", type: "I" },
+            { result: "Aerora", s1: "Aero", s2: "Aero", type: "E" },
+            { result: "Aeroga", s1: "Aerora", s2: "Quick Blitz", type: "O" },
+            { result: "Aeroga", s1: "Aerora", s2: "Aero", type: "M" },
+            { result: "Aeroga", s1: "Aerora", s2: "Aerora", type: "N" },
+            { result: "Warp", s1: "Zero Gravira", s2: "Thundara", type: "I", rare: true },
+            { result: "Warp", s1: "Zero Gravira", s2: "Zero Gravity", type: "M", rare: true },
+            { result: "Warp", s1: "Zero Gravira", s2: "Zero Gravira", type: "N", rare: true },
+            { result: "Warp", s1: "Zero Gravity", s2: "Thunder", type: "I", rare: true },
+            { result: "Warp", s1: "Zero Gravity", s2: "Zero Gravity", type: "M", rare: true },
+            { result: "Warp", s1: "Magnet", s2: "Aero", type: "P", rare: true },
+            { result: "Faith", s1: "Wind Raid", s2: "Break Time", type: "N" },
+            { result: "Deep Freeze", s1: "Blizzaga", s2: "Freeze Raid", type: "G" },
+            { result: "Deep Freeze", s1: "Blizzaga", s2: "Binding Strike", type: "H" },
+            { result: "Deep Freeze", s1: "Blizzaga", s2: "Triple Blizzaga", type: "F" },
+            { result: "Glacier", s1: "Deep Freeze", s2: "Blizzaga", type: "E" },
+            { result: "Glacier", s1: "Deep Freeze", s2: "Triple Blizzaga", type: "F" },
+            { result: "Ice Barrage", s1: "Blizzaga", s2: "Mine Shield", type: "F" },
+            { result: "Ice Barrage", s1: "Blizzaga", s2: "Mine Square", type: "H" },
+            { result: "Firaga Burst", s1: "Fira", s2: "Aeroga", type: "A", rare: true },
+            { result: "Firaga Burst", s1: "Firaga", s2: "Aerora", type: "A", rare: true },
+            { result: "Firaga Burst", s1: "Firaga", s2: "Aeroga", type: "B", rare: true },
+            { result: "Firaga Burst", s1: "Firaga", s2: "Slow", type: "A", rare: true },
+            { result: "Firaga Burst", s1: "Firaga", s2: "Stopra", type: "D", rare: true },
+            { result: "Firaga Burst", s1: "Firaga", s2: "Stopga", type: "B", rare: true },
+            { result: "Raging Storm", s1: "Fission Firaga", s2: "Firaga Burst", type: "B" },
+            { result: "Raging Storm", s1: "Fira", s2: "Fire Dash", type: "D", rare: true },
+            { result: "Raging Storm", s1: "Fira", s2: "Fire", type: "A", rare: true },
+            { result: "Raging Storm", s1: "Fira", s2: "Fira", type: "B", rare: true },
+            { result: "Raging Storm", s1: "Fira", s2: "Firaga", type: "A", rare: true },
+            { result: "Raging Storm", s1: "Firaga", s2: "Blitz", type: "D", rare: true },
+            { result: "Raging Storm", s1: "Firaga", s2: "Firaga", type: "B", rare: true },
+            { result: "Raging Storm", s1: "Fire Surge", s2: "Cartwheel", type: "C", rare: true },
+            { result: "Mega Flare", s1: "Fission Firaga", s2: "Crawling Fire", type: "B" },
+            { result: "Quake", s1: "Brutal Blast", s2: "Zero Graviga", type: "B" },
+            { result: "Quake", s1: "Brutal Blast", s2: "Magnega", type: "C" },
+            { result: "Quake", s1: "Brutal Blast", s2: "Brutal Blast", type: "N", rare: true },
+            { result: "Quake", s1: "Stun Edge", s2: "Mine Shield", type: "O", rare: true },
+            { result: "Quake", s1: "Binding Strike", s2: "Mine Square", type: "L", rare: true },
+            { result: "Meteor", s1: "Geo Impact", s2: "Quake", type: "B" },
+            { result: "Meteor", s1: "Brutal Blast", s2: "Zero Graviga", type: "B", rare: true },
+            { result: "Meteor", s1: "Brutal Blast", s2: "Magnega", type: "C", rare: true },
+            { result: "Tornado", s1: "Magnega", s2: "Aeroga", type: "N" },
+            { result: "Tornado", s1: "Aerora", s2: "Quick Blitz", type: "O", rare: true },
+            { result: "Tornado", s1: "Aerora", s2: "Aero", type: "M", rare: true },
+            { result: "Tornado", s1: "Aerora", s2: "Aerora", type: "N", rare: true },
+            { result: "Tornado", s1: "Aero", s2: "Quick Blitz", type: "G", rare: true },
+            { result: "Tornado", s1: "Aero", s2: "Thunder", type: "I", rare: true },
+            { result: "Tornado", s1: "Aero", s2: "Aero", type: "E", rare: true },
+            { result: "Transcendence", s1: "Magnet Spiral", s2: "Zero Graviga", type: "J" },
+            { result: "Mini", s1: "Magnega", s2: "Magnega", type: "J" },
+            { result: "Mini", s1: "Magnega", s2: "Bind", type: "I" },
+            { result: "Mini", s1: "Magnera", s2: "Warp", type: "N" },
+            { result: "Blackout", s1: "Zero Gravity", s2: "Confuse", type: "M" },
+            { result: "Blackout", s1: "Zero Gravira", s2: "Confuse", type: "N" },
+            { result: "Blackout", s1: "Zero Gravira", s2: "Poison", type: "P" },
+            { result: "Ignite", s1: "Bind", s2: "Fire", type: "A" },
+            { result: "Ignite", s1: "Bind", s2: "Fira", type: "C" },
+            { result: "Stopra", s1: "Slow", s2: "Slow", type: "L" },
+            { result: "Stopra", s1: "Slow", s2: "Stop", type: "K" },
+            { result: "Stopra", s1: "Stop", s2: "Stop", type: "I" },
+            { result: "Stopga", s1: "Stopra", s2: "Stop", type: "I" },
+            { result: "Stopga", s1: "Stopra", s2: "Stopra", type: "J" },
+            { result: "Thunder Roll", s1: "Dodge Roll", s2: "Thunder Surge", type: "P" },
+            { result: "Thunder Roll", s1: "Dodge Roll", s2: "Thundaga", type: "L" },
+            { result: "Thunder Roll", s1: "Dodge Roll", s2: "Stun Block", type: "L" },
+            { result: "Firewheel", s1: "Cartwheel", s2: "Fire Surge", type: "B" },
+            { result: "Firewheel", s1: "Cartwheel", s2: "Firaga", type: "B" },
+            { result: "Firewheel", s1: "Cartwheel", s2: "Fission Firaga", type: "C" },
+            { result: "Ice Slide", s1: "Air Slide", s2: "Blizzard Edge", type: "F" },
+            { result: "Ice Slide", s1: "Air Slide", s2: "Blizzaga", type: "H" },
+            { result: "Fire Glide", s1: "Glide", s2: "Fire Surge", type: "C" },
+            { result: "Fire Glide", s1: "Glide", s2: "Firaga", type: "B" },
+            { result: "Homing Slide", s1: "Sliding Dash", s2: "Magnera", type: "P" },
+            { result: "Homing Slide", s1: "Sliding Dash", s2: "Air Slide", type: "C" },
+            { result: "Homing Slide", s1: "Magnet", s2: "Air Slide", type: "L" },
+            { result: "Renewal Block", s1: "Block", s2: "Curaga", type: "P" },
+            { result: "Renewal Block", s1: "Block", s2: "Esuna", type: "C" },
+            { result: "Stun Block", s1: "Block", s2: "Stun Edge", type: "L" },
+            { result: "Stun Block", s1: "Block", s2: "Thundaga", type: "I" },
+            { result: "Poison Block", s1: "Block", s2: "Poison Edge", type: "H" },
+            { result: "Poison Block", s1: "Block", s2: "Poison", type: "P" },
+            { result: "Renewal Barrier", s1: "Barrier", s2: "Curaga", type: "P" },
+            { result: "Renewal Barrier", s1: "Barrier", s2: "Esuna", type: "N" },
+            { result: "Confuse Barrier", s1: "Barrier", s2: "Confusion Strike", type: "C" },
+            { result: "Confuse Barrier", s1: "Barrier", s2: "Confuse", type: "L" },
+            { result: "Stop Barrier", s1: "Barrier", s2: "Stopga", type: "C" },
+            { result: "Payback Fang", s1: "Sliding Dash", s2: "Counter Hammer", type: "P" },
+            { result: "Payback Raid", s1: "Sliding Dash", s2: "Strike Raid", type: "P" },
+            { result: "Payback Surge", s1: "Sliding Dash", s2: "Fire Surge", type: "C" },
+            { result: "Payback Surge", s1: "Sliding Dash", s2: "Thunder Surge", type: "L" }
+        ];
+
+        const CRYSTAL_COLORS = {
+            Shimmering: "text-red-300",
+            Fleeting: "text-green-300",
+            Pulsing: "text-purple-300",
+            Wellspring: "text-blue-300",
+            Soothing: "text-pink-300",
+            Hungry: "text-yellow-300",
+            Abounding: "text-orange-300"
+        };
+
+        // --- ICONS (SVG Strings) ---
+        const ICONS = {
+            sparkles: `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M9 9h4"/></svg>`,
+            sword: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="14.5 17.5 3 6 3 3 6 3 17.5 14.5"/><line x1="13" x2="19" y1="19" y2="13"/><line x1="16" x2="20" y1="16" y2="20"/><line x1="19" x2="21" y1="21" y2="19"/></svg>`
+        };
+
+        // --- DOM ELEMENTS ---
+        const typeSelect = document.getElementById('filter-type');
+        const componentSelect = document.getElementById('filter-component');
+        const clearBtn = document.getElementById('btn-clear');
+        const resultsCountLabel = document.getElementById('results-count');
+        const recipeGrid = document.getElementById('recipe-grid');
+
+        // --- INIT ---
+        function init() {
+            populateOptions();
+            attachListeners();
+            render();
+        }
+
+        // --- LOGIC ---
+
+        function populateOptions() {
+            // Populate Type Select
+            const types = Object.keys(ABILITY_MATRIX);
+            types.forEach(type => {
+                const option = document.createElement('option');
+                option.value = type;
+                option.textContent = `Type ${type}`;
+                typeSelect.appendChild(option);
+            });
+
+            // Populate Component Select
+            const components = new Set();
+            RECIPES.forEach(r => {
+                components.add(r.s1);
+                components.add(r.s2);
+            });
+            const sortedComponents = Array.from(components).sort();
+
+            sortedComponents.forEach(comp => {
+                const option = document.createElement('option');
+                option.value = comp;
+                option.textContent = comp;
+                componentSelect.appendChild(option);
+            });
+        }
+
+        function attachListeners() {
+            typeSelect.addEventListener('change', render);
+            componentSelect.addEventListener('change', render);
+            clearBtn.addEventListener('click', () => {
+                typeSelect.value = "";
+                componentSelect.value = "";
+                render();
+            });
+        }
+
+        function render() {
+            const selectedType = typeSelect.value;
+            const selectedComponent = componentSelect.value;
+
+            // Filter logic
+            const filtered = RECIPES.filter(recipe => {
+                const matchesType = selectedType ? recipe.type === selectedType : true;
+                const matchesComponent = selectedComponent
+                    ? (recipe.s1 === selectedComponent || recipe.s2 === selectedComponent)
+                    : true;
+                return matchesType && matchesComponent;
+            });
+
+            // Update UI State for Clear Button
+            const hasFilter = selectedType || selectedComponent;
+            if (hasFilter) {
+                clearBtn.disabled = false;
+                clearBtn.className = "w-full md:w-auto px-6 py-3 rounded-lg font-medium transition-all flex items-center justify-center gap-2 bg-red-500/20 text-red-300 hover:bg-red-500/30 border border-red-500/50 cursor-pointer";
+            } else {
+                clearBtn.disabled = true;
+                clearBtn.className = "w-full md:w-auto px-6 py-3 rounded-lg font-medium transition-all flex items-center justify-center gap-2 bg-slate-700 text-slate-500 cursor-not-allowed border border-slate-600";
+            }
+
+            // Update Count
+            const s = filtered.length !== 1 ? 's' : '';
+            resultsCountLabel.textContent = `Found ${filtered.length} recipe${s}`;
+
+            // Render Grid
+            if (filtered.length === 0) {
+                recipeGrid.innerHTML = `
+                    <div class="col-span-1 md:col-span-2 xl:col-span-3 text-center py-20 bg-slate-800/30 rounded-2xl border border-dashed border-slate-700">
+                        <div class="text-slate-500 text-lg">No recipes match your combination.</div>
+                        <div class="text-slate-600 text-sm mt-2">Try clearing filters or changing the ingredient.</div>
+                    </div>
+                `;
+            } else {
+                recipeGrid.innerHTML = filtered.map(createRecipeCard).join('');
+            }
+        }
+
+        function createRecipeCard(recipe) {
+            const abilities = ABILITY_MATRIX[recipe.type];
+
+            // Generate Ability List HTML
+            const abilityListHtml = Object.entries(abilities).map(([crystal, ability]) => `
+                <div class="flex flex-col bg-slate-900/40 p-2 rounded border border-slate-700/50">
+                    <span class="font-bold ${CRYSTAL_COLORS[crystal] || 'text-slate-300'}">${crystal}</span>
+                    <span class="text-slate-300 truncate" title="${ability}">${ability}</span>
+                </div>
+            `).join('');
+
+            return `
+                <div class="bg-slate-800 border border-slate-700 rounded-xl overflow-hidden shadow-lg transition-all hover:shadow-cyan-900/20 hover:border-slate-600">
+                    <!-- Header -->
+                    <div class="bg-slate-900/50 p-4 border-b border-slate-700 flex justify-between items-center">
+                        <div class="flex items-center gap-2">
+                            <span class="text-yellow-400">${ICONS.sparkles}</span>
+                            <h3 class="text-xl font-bold text-white kh-font tracking-wide">${recipe.result}</h3>
+                        </div>
+                        <div class="bg-cyan-900/40 text-cyan-200 px-3 py-1 rounded-full text-xs font-mono border border-cyan-800">
+                            Type ${recipe.type}
+                        </div>
+                    </div>
+
+                    <!-- Ingredients -->
+                    <div class="p-4 bg-slate-800/80">
+                        <div class="text-xs text-slate-400 uppercase tracking-wider mb-2 font-semibold">Ingredients</div>
+                        <div class="flex flex-col sm:flex-row gap-2 sm:gap-4 sm:items-center">
+                            <div class="bg-slate-700 px-3 py-2 rounded text-sm text-slate-200 flex-1 flex items-center gap-2">
+                                ${ICONS.sword} ${recipe.s1}
+                            </div>
+                            <span class="text-slate-500 font-bold text-center">+</span>
+                            <div class="bg-slate-700 px-3 py-2 rounded text-sm text-slate-200 flex-1 flex items-center gap-2">
+                                ${ICONS.sword} ${recipe.s2}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Ability Matrix Display -->
+                    <div class="px-4 pb-4">
+                        <div class="mt-4 border-t border-slate-700 pt-3">
+                            <div class="text-xs text-slate-400 uppercase tracking-wider mb-3 font-semibold">
+                                Resulting Abilities (Type ${recipe.type})
+                            </div>
+                            
+                            <div class="grid grid-cols-2 gap-2 text-xs">
+                                ${abilityListHtml}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Start App
+        init();
+    </script>
+</body>
+
+</html>
