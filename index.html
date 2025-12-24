@@ -1,39 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <title>Test Page</title>
+    <link rel="icon" href="icon_shape.svg">
     <style>
-        .main{
+        .main {
             margin: 0;
             position: absolute;
             top: 50%;
-            -ms-transform: translateY(-50%);
+            left: 20%; /* Replaced margin-left for better positioning */
             transform: translateY(-50%);
-            margin-left: 20%;
             display: flex;
             flex-direction: row;
-            align-items: flex-start;
-            filter:opacity(0.6);
+            align-items: center; /* Changed from flex-start to center for better alignment */
+            filter: opacity(0.6);
             transition: 0.6s;
+            gap: 20px; /* Adds space between the buttons and image */
         }
-        .image{
+
+        .main:hover {
+            filter: opacity(1);
+        }
+
+        /* Stylized Button Class */
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+            text-decoration: none;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            font-family: sans-serif;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+
+        .btn:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+            border-color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        .image {
             height: 2cm;
             width: 2cm;
-            padding-left: 10px;
-            padding-top: 15px;
         }
-        .main:hover{
-            filter: opacity(1)
+
+        p {
+            margin: 0;
+            font-weight: bold;
         }
     </style>
-    
-    <link rel="icon" href="icon_shape.svg">
 </head>
 
-
-<title>Test Page</title>
-<body style="background: linear-gradient(-135deg,rgb(126, 126, 126),black);">
+<body style="background: linear-gradient(-135deg, rgb(126, 126, 126), black); min-height: 100vh; margin: 0;">
     <div class="main">
         <p style="font-size: 1cm; color: white;">aforce23</p>
-        <a href="command_meld.html">Command Meld</a>
-        <a href="Command_Recipe_Tree.html">Recipe Tree</a>
-        <img src="icon_shape.svg" class="image">
+        
+        <a href="command_meld.html" class="btn">Command Meld</a>
+        <a href="Command_Recipe_Tree.html" class="btn">Recipe Tree</a>
+        <a href="command_type_finder.html" class="btn">Type Finder</a>
+
+        <img src="icon_shape.svg" class="image" alt="Icon">
     </div>
 </body>
+</html>
