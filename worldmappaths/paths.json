@@ -1,0 +1,141 @@
+[
+    {
+        "points": [
+            [
+                1926,
+                3905
+            ],
+            [
+                1904,
+                3809
+            ],
+            [
+                1951,
+                3793
+            ],
+            [
+                1992,
+                3825
+            ],
+            [
+                2015,
+                3812
+            ],
+            [
+                2033,
+                3790
+            ],
+            [
+                2073,
+                3799
+            ],
+            [
+                2101,
+                3692
+            ],
+            [
+                2142,
+                3649
+            ],
+            [
+                2164,
+                3574
+            ],
+            [
+                2174,
+                3527
+            ],
+            [
+                2172,
+                3430
+            ],
+            [
+                2159,
+                3323
+            ],
+            [
+                2138,
+                3275
+            ],
+            [
+                2074,
+                3252
+            ]
+        ],
+        "type": "normal",
+        "group": "Volume 1",
+        "options": {
+            "color": "#AAFF00"
+        },
+        "popupContent": {
+            "title": "Session 0",
+            "description": "Andrin and Fryce's journey to Port Damali"
+        }
+    },
+    {
+        "points": [
+            [
+                2075,
+                3251
+            ],
+            [
+                2135,
+                3254
+            ],
+            [
+                2146,
+                3216
+            ],
+            [
+                2178,
+                3206
+            ],
+            [
+                2215,
+                3169
+            ],
+            [
+                2222,
+                3135
+            ],
+            [
+                2261,
+                3113
+            ],
+            [
+                2169,
+                2997
+            ]
+        ],
+        "type": "normal",
+        "group": "Volume 1",
+        "options": {
+            "color": "#7e157b"
+        },
+        "popupContent": {
+            "title": "Session 1",
+            "description": "The Gem Seekers travel to their first dungeon in the Temple of Serpentus."
+        }
+    },
+    {
+        "points": [
+            [
+                2608,
+                6768
+            ],
+            [
+                3890,
+                5106
+            ]
+        ],
+        "type": "dotted",
+        "group": "Volume 3",
+        "options": {
+            "color": "#3ce7b4"
+        },
+        "popupContent": {
+            "title": "Session 41",
+            "description": "The Gem Seekers warp to Shadycreek Run on their quest to the Blooming Grove with the assistance of the mage's court of Rosohna."
+        }
+    }
+]

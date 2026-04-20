@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>World Map Path Viewer</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Floating custom tooltip -->
+    <div id="cursor-tooltip" class="custom-tooltip" style="display: none; position: absolute; z-index: 1000; pointer-events: none;"></div>
+
+    <!-- Path Visibility Panel -->
+    <div id="visibility-panel" class="collapsed">
+        <div class="panel-header">
+            <h3>Visibility Menu</h3>
+            <button class="collapse-btn" id="toggle-visibility" title="Expand Visibility Menu"><i class="fa-solid fa-eye"></i></button>
+        </div>
+        <div id="visibility-controls"></div>
+    </div>
+
+    <!-- Path Editor Panel -->
+    <div id="editor-panel" class="collapsed">
+        <div class="panel-header">
+            <h3>Path Editor</h3>
+            <button class="collapse-btn" id="toggle-editor-panel" title="Expand Editor"><i class="fa-solid fa-pen"></i></button>
+        </div>
+        <div id="editor-content">
+            <button id="toggle-editor">Start Drawing</button>
+        <button id="clear-editor">Clear Current Drawing</button>
+        
+        <div id="editor-details" style="display:none; margin-top: 10px;">
+            <input type="text" id="path-title" placeholder="Path Title" class="editor-input" />
+            <input type="text" id="path-group" placeholder="Path Group (e.g. Volume 1)" class="editor-input" />
+            <textarea id="path-desc" placeholder="Path Description" rows="3" class="editor-input"></textarea>
+            <select id="path-type" class="editor-input">
+                <option value="normal">Normal Line</option>
+                <option value="dashed">Dashed Line</option>
+                <option value="dotted">Dotted Line</option>
+                <option value="bicolored">Bicolored Line</option>
+            </select>
+            <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+                <div style="width: 48%;">
+                    <label style="font-size:12px; color:#a0aab5;">Primary Color</label>
+                    <input type="color" id="path-color-1" value="#e74c3c" style="width:100%; border:none; background:transparent; cursor:pointer;" />
+                </div>
+                <div style="width: 48%;">
+                    <label style="font-size:12px; color:#a0aab5;">Secondary Color</label>
+                    <input type="color" id="path-color-2" value="#3498db" style="width:100%; border:none; background:transparent; cursor:pointer;" />
+                </div>
+            </div>
+            <button id="save-drawn-path" style="background:#2ecc71;">Save To Map</button>
+        </div>
+
+        <hr style="border: 0; height: 1px; background: rgba(255,255,255,0.1); margin: 15px 0;">
+        <button id="export-json" style="background:#9b59b6; margin-bottom: 0;">Export paths.json</button>
+
+        <div id="editor-coords" style="display:none;"></div>
+        </div>
+    </div>
+
+    <div id="map"></div>
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+    <script src="script.js"></script>
+</body>
+</html>
