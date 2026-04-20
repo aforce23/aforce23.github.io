@@ -137,5 +137,360 @@
             "title": "Session 41",
             "description": "The Gem Seekers warp to Shadycreek Run on their quest to the Blooming Grove with the assistance of the mage's court of Rosohna."
         }
+    },
+    {
+        "points": [
+            [
+                2073,
+                3261
+            ],
+            [
+                2133,
+                3259
+            ],
+            [
+                2158,
+                3322
+            ],
+            [
+                2214,
+                3389
+            ],
+            [
+                2282,
+                3366
+            ],
+            [
+                2333,
+                3319
+            ],
+            [
+                2394,
+                3301
+            ],
+            [
+                2435,
+                3346
+            ],
+            [
+                2498,
+                3306
+            ]
+        ],
+        "type": "normal",
+        "group": "Volume 1",
+        "options": {
+            "color": "#9a47ff"
+        },
+        "popupContent": {
+            "title": "Session 5",
+            "description": "The Gem Seekers travel with Lyra to banish the undead and a necromancer in Tussoa."
+        }
+    },
+    {
+        "points": [
+            [
+                2503.16,
+                3305.02
+            ],
+            [
+                2457.9,
+                3319.87
+            ],
+            [
+                2433.86,
+                3280.98
+            ],
+            [
+                2382.24,
+                3244.21
+            ],
+            [
+                2228.09,
+                3342.49
+            ],
+            [
+                2169.4,
+                3285.93
+            ],
+            [
+                2105.76,
+                3309.97
+            ],
+            [
+                2055.56,
+                3256.93
+            ]
+        ],
+        "type": "normal",
+        "group": "Volume 1",
+        "options": {
+            "color": "#ffaf24"
+        },
+        "popupContent": {
+            "title": "Session 7",
+            "description": "A Ferry Ride back to Port Damali after defeating the evil in Tussoa."
+        }
+    },
+    {
+        "points": [
+            [
+                3918.79,
+                5103.9
+            ],
+            [
+                3989.5,
+                5110.97
+            ],
+            [
+                4061.62,
+                5176.73
+            ]
+        ],
+        "type": "normal",
+        "group": "Volume 3",
+        "options": {
+            "color": "#00cc3d"
+        },
+        "popupContent": {
+            "title": "Session 42",
+            "description": "A trek through the Savalirwood to seek the Skyhunterbow in Blooming Grove."
+        }
+    },
+    {
+        "points": [
+            [
+                2057.68,
+                3262.59
+            ],
+            [
+                2088.79,
+                3328.35
+            ],
+            [
+                2146.78,
+                3297.24
+            ],
+            [
+                2175.77,
+                3287.34
+            ],
+            [
+                2226.68,
+                3355.22
+            ],
+            [
+                2358.2,
+                3248.45
+            ],
+            [
+                2443.76,
+                3277.44
+            ],
+            [
+                2472.75,
+                3350.27
+            ],
+            [
+                2594.37,
+                3375.73
+            ],
+            [
+                2661.55,
+                3338.96
+            ],
+            [
+                2713.17,
+                3421.69
+            ],
+            [
+                2746.4,
+                3384.92
+            ],
+            [
+                2803.68,
+                3390.58
+            ],
+            [
+                2906.21,
+                3360.17
+            ],
+            [
+                2964.9,
+                3449.27
+            ],
+            [
+                3056.12,
+                3473.31
+            ],
+            [
+                3104.91,
+                3519.27
+            ],
+            [
+                3129.65,
+                3561.7
+            ],
+            [
+                3225.82,
+                3532
+            ],
+            [
+                3256.23,
+                3621.8
+            ],
+            [
+                3201.07,
+                3778.78
+            ]
+        ],
+        "type": "normal",
+        "group": "Volume 1",
+        "options": {
+            "color": "#24bdff"
+        },
+        "popupContent": {
+            "title": "Session 8",
+            "description": "The Gem Seekers travel North on Durrock's boat to Pride's Call to find the source of corruption in the Dwendalian Empire."
+        }
+    },
+    {
+        "points": [
+            [
+                3204.61,
+                3784.44
+            ],
+            [
+                3275.32,
+                3850.9
+            ],
+            [
+                3314.92,
+                3852.32
+            ],
+            [
+                3477.55,
+                3968.28
+            ],
+            [
+                3559.58,
+                4085.66
+            ],
+            [
+                3583.62,
+                4116.78
+            ],
+            [
+                3556.75,
+                4170.52
+            ],
+            [
+                3541.19,
+                4249.71
+            ],
+            [
+                3562.4,
+                4317.59
+            ],
+            [
+                3613.32,
+                4399.62
+            ],
+            [
+                3627.46,
+                4449.12
+            ],
+            [
+                3626.04,
+                4498.61
+            ]
+        ],
+        "type": "normal",
+        "group": "Volume 1",
+        "options": {
+            "color": "#db1a1a"
+        },
+        "popupContent": {
+            "title": "Session 9",
+            "description": "The Gem Seekers travel to the Amber Crossroads."
+        }
+    },
+    {
+        "points": [
+            [
+                3628.87,
+                4501.44
+            ],
+            [
+                3661.4,
+                4596.19
+            ],
+            [
+                3706.65,
+                4597.61
+            ]
+        ],
+        "type": "normal",
+        "group": "Volume 1",
+        "options": {
+            "color": "#dbc11a"
+        },
+        "popupContent": {
+            "title": "Session 10",
+            "description": "The Gem Seekers arrive in Rexxentrum to meet Jusel and learn of Oscar's imprisonment."
+        }
+    },
+    {
+        "points": [
+            [
+                3712,
+                4594
+            ],
+            [
+                3674,
+                4619
+            ],
+            [
+                3755,
+                4939
+            ],
+            [
+                3763,
+                5014
+            ],
+            [
+                3718,
+                5130
+            ],
+            [
+                3667,
+                5166
+            ],
+            [
+                3641,
+                5252
+            ],
+            [
+                3598,
+                5258
+            ],
+            [
+                3529,
+                5275
+            ],
+            [
+                3485,
+                5311
+            ]
+        ],
+        "type": "normal",
+        "group": "Volume 2",
+        "options": {
+            "color": "#db5d1a"
+        },
+        "popupContent": {
+            "title": "Session 19",
+            "description": "The Gem Seekers ride for Autumn Grove to fufill their duty, only to change heading to meet Jaro in Talonstadt."
+        }
     }
 ]
