@@ -31,8 +31,8 @@ function hideTooltip() {
 }
 
 // Map dimensions and loading
-//const imgSrc = 'https://static.wikitide.net/criticalrolewiki/9/90/Wildemount_Poster_Map.jpg';
-const imgSrc = 'Wildemount_Map.jpg';
+const imgSrc = 'https://static.wikitide.net/criticalrolewiki/9/90/Wildemount_Poster_Map.jpg';
+//const imgSrc = 'Wildemount_Map.jpg';
 const img = new Image();
 img.onload = function () {
     const w = this.naturalWidth;
