@@ -31,7 +31,8 @@ function hideTooltip() {
 }
 
 // Map dimensions and loading
-const imgSrc = 'https://static.wikitide.net/criticalrolewiki/9/90/Wildemount_Poster_Map.jpg';
+//const imgSrc = 'https://static.wikitide.net/criticalrolewiki/9/90/Wildemount_Poster_Map.jpg';
+const imgSrc = 'Wildemount_Map.jpg';
 const img = new Image();
 img.onload = function () {
     const w = this.naturalWidth;
@@ -43,11 +44,13 @@ img.onload = function () {
 
     // Once map limits are determined, fetch JSON paths
     loadPathsFromJson();
+    loadPointsFromJson();
 };
 img.src = imgSrc;
 
 // Array tracking all loaded or created paths for export
 let allPaths = [];
+let allPoints = [];
 
 // Global variable to track all path layer groups by category
 const pathCategories = {};
@@ -68,6 +71,24 @@ async function loadPathsFromJson() {
         }
     } catch (e) {
         console.warn('Failed to load paths.json. Are you running a local server?', e);
+    }
+}
+
+async function loadPointsFromJson() {
+    try {
+        const response = await fetch('points.json');
+        if (response.ok) {
+            const data = await response.json();
+            data.forEach(pointData => {
+                allPoints.push(pointData);
+                drawPath(pointData.points, pointData.type, pointData.options, pointData.popupContent, pointData.group);
+            });
+            buildVisibilityMenu();
+        } else {
+            console.warn('points.json not found. Proceeding with empty state.');
+        }
+    } catch (e) {
+        console.warn('Failed to load points.json. Are you running a local server?', e);
     }
 }
 
@@ -114,57 +135,77 @@ function drawPath(points, type, options, popupContent, groupName) {
         className: ''
     };
 
-    if (type === 'normal') {
-        layers.push(L.polyline(smoothPoints, baseStyle).addTo(pathFeatureGroup));
-    } else if (type === 'dashed') {
-        const dashedStyle = { ...baseStyle, dashArray: '10, 10' };
-        layers.push(L.polyline(smoothPoints, dashedStyle).addTo(pathFeatureGroup));
-    } else if (type === 'dotted') {
-        const dottedStyle = { ...baseStyle, dashArray: '1, 15', lineCap: 'round' };
-        layers.push(L.polyline(smoothPoints, dottedStyle).addTo(pathFeatureGroup));
-    } else if (type === 'bicolored') {
-        const bottomColor = options.baseColor || '#000000';
-        const topColor = options.topColor || '#ffffff';
+    if (type === 'marker') {
+        if (points.length > 0) {
+            const markerColor = options.color || '#3498db';
+            const marker = L.circleMarker(points[0], { 
+                radius: 6, // scaled down
+                color: '#ffffff', // white border ring 
+                weight: 2, 
+                fillColor: markerColor, 
+                fillOpacity: 1 
+            }).addTo(pathFeatureGroup);
 
-        const bottomStyle = { ...baseStyle, color: bottomColor, weight: baseStyle.weight + 4 };
-        const topStyle = { ...baseStyle, color: topColor, dashArray: '15, 15' };
+            // Show POI name only when clicked using popup
+            if (popupContent.title) {
+                let text = `<b>${popupContent.title}</b>`;
+                if (popupContent.description) text += `<br>${popupContent.description}`;
+                marker.bindPopup(text);
+            }
+        }
+    } else {
+        if (type === 'normal') {
+            layers.push(L.polyline(smoothPoints, baseStyle).addTo(pathFeatureGroup));
+        } else if (type === 'dashed') {
+            const dashedStyle = { ...baseStyle, dashArray: '10, 10' };
+            layers.push(L.polyline(smoothPoints, dashedStyle).addTo(pathFeatureGroup));
+        } else if (type === 'dotted') {
+            const dottedStyle = { ...baseStyle, dashArray: '1, 15', lineCap: 'round' };
+            layers.push(L.polyline(smoothPoints, dottedStyle).addTo(pathFeatureGroup));
+        } else if (type === 'bicolored') {
+            const bottomColor = options.baseColor || '#000000';
+            const topColor = options.topColor || '#ffffff';
 
-        layers.push(L.polyline(smoothPoints, bottomStyle).addTo(pathFeatureGroup));
-        layers.push(L.polyline(smoothPoints, topStyle).addTo(pathFeatureGroup));
-    }
+            const bottomStyle = { ...baseStyle, color: bottomColor, weight: baseStyle.weight + 4 };
+            const topStyle = { ...baseStyle, color: topColor, dashArray: '15, 15' };
 
-    // Place the start/end circles on the literal uncurved endpoints
-    if (points.length > 0) {
-        L.circleMarker(points[0], { radius: 7, color: '#2ecc71', weight: 2, fillColor: '#121212', fillOpacity: 1 }).addTo(pathFeatureGroup);
-        L.circleMarker(points[points.length - 1], { radius: 7, color: '#e74c3c', weight: 2, fillColor: '#121212', fillOpacity: 1 }).addTo(pathFeatureGroup);
-    }
+            layers.push(L.polyline(smoothPoints, bottomStyle).addTo(pathFeatureGroup));
+            layers.push(L.polyline(smoothPoints, topStyle).addTo(pathFeatureGroup));
+        }
 
-    // Store original weights for correct hover interactions
-    const originalWeights = layers.map(l => l.options.weight);
+        // Place the start/end circles on the literal uncurved endpoints
+        if (points.length > 0) {
+            L.circleMarker(points[0], { radius: 7, color: '#2ecc71', weight: 2, fillColor: '#121212', fillOpacity: 1 }).addTo(pathFeatureGroup);
+            L.circleMarker(points[points.length - 1], { radius: 7, color: '#e74c3c', weight: 2, fillColor: '#121212', fillOpacity: 1 }).addTo(pathFeatureGroup);
+        }
 
-    layers.forEach((layer, idx) => {
-        // Hitbox also follows the curve
-        const hitboxStyle = { color: 'transparent', weight: 20, opacity: 0 };
-        const hitbox = L.polyline(smoothPoints, hitboxStyle).addTo(pathFeatureGroup);
+        // Store original weights for correct hover interactions
+        const originalWeights = layers.map(l => l.options.weight);
 
-        hitbox.on('mouseover', () => {
-            layers.forEach((l, lIndex) => {
-                const el = l.getElement();
-                if (el) el.classList.add('path-glow');
-                l.setStyle({ opacity: 1, weight: originalWeights[lIndex] + 2 });
+        layers.forEach((layer, idx) => {
+            // Hitbox also follows the curve
+            const hitboxStyle = { color: 'transparent', weight: 20, opacity: 0 };
+            const hitbox = L.polyline(smoothPoints, hitboxStyle).addTo(pathFeatureGroup);
+
+            hitbox.on('mouseover', () => {
+                layers.forEach((l, lIndex) => {
+                    const el = l.getElement();
+                    if (el) el.classList.add('path-glow');
+                    l.setStyle({ opacity: 1, weight: originalWeights[lIndex] + 2 });
+                });
+                showTooltip(popupContent.title, popupContent.description);
             });
-            showTooltip(popupContent.title, popupContent.description);
-        });
 
-        hitbox.on('mouseout', () => {
-            layers.forEach((l, lIndex) => {
-                const el = l.getElement();
-                if (el) el.classList.remove('path-glow');
-                l.setStyle({ opacity: baseStyle.opacity, weight: originalWeights[lIndex] });
+            hitbox.on('mouseout', () => {
+                layers.forEach((l, lIndex) => {
+                    const el = l.getElement();
+                    if (el) el.classList.remove('path-glow');
+                    l.setStyle({ opacity: baseStyle.opacity, weight: originalWeights[lIndex] });
+                });
+                hideTooltip();
             });
-            hideTooltip();
         });
-    });
+    }
 
     // Add path to map immediately
     pathFeatureGroup.addTo(map);
@@ -257,9 +298,11 @@ let currentMarkers = [];
 
 const btnToggle = document.getElementById('toggle-editor');
 const btnClear = document.getElementById('clear-editor');
+const btnUndo = document.getElementById('undo-editor');
 const editorDetails = document.getElementById('editor-details');
 const btnSave = document.getElementById('save-drawn-path');
 const btnExport = document.getElementById('export-json');
+const btnExportPoints = document.getElementById('export-points-json');
 
 // Input fields
 const inputTitle = document.getElementById('path-title');
@@ -294,11 +337,44 @@ function clearEditor() {
 
 btnClear.addEventListener('click', clearEditor);
 
+if (btnUndo) {
+    btnUndo.addEventListener('click', () => {
+        if (editorPoints.length > 0) {
+            editorPoints.pop();
+            const lastMarker = currentMarkers.pop();
+            if (lastMarker) map.removeLayer(lastMarker);
+            
+            if (inputType.value !== 'marker') {
+                let previewPoints = getCurvePoints(editorPoints);
+                if (editorPoints.length === 0 && tempPolyline) {
+                    map.removeLayer(tempPolyline);
+                    tempPolyline = null;
+                } else if (tempPolyline) {
+                    tempPolyline.setLatLngs(previewPoints);
+                }
+            }
+        }
+    });
+}
+
 map.on('click', (e) => {
     if (!isDrawing) return;
 
     // Push precise points
     const pt = [Math.round(e.latlng.lat * 100) / 100, Math.round(e.latlng.lng * 100) / 100];
+
+    if (inputType.value === 'marker') {
+        if (currentMarkers.length > 0) {
+            currentMarkers.forEach(m => map.removeLayer(m));
+            currentMarkers = [];
+        }
+        editorPoints = [pt];
+        const markerColor = inputPrimaryColor.value || '#3498db';
+        const marker = L.circleMarker(pt, { radius: 6, color: '#ffffff', weight: 2, fillColor: markerColor, fillOpacity: 1 }).addTo(map);
+        currentMarkers.push(marker);
+        return;
+    }
+
     editorPoints.push(pt);
 
     // Indicator node
@@ -315,7 +391,19 @@ map.on('click', (e) => {
 });
 
 btnSave.addEventListener('click', () => {
-    if (editorPoints.length < 2) {
+    let type = inputType.value;
+
+    if (editorPoints.length === 0) {
+        alert("Plot something first!");
+        return;
+    }
+
+    // Auto-convert to POI marker if only 1 point is plotted
+    if (editorPoints.length === 1 && type !== 'marker') {
+        type = 'marker';
+    }
+
+    if (type !== 'marker' && editorPoints.length < 2) {
         alert("Plot at least 2 points for a path first!");
         return;
     }
@@ -323,7 +411,6 @@ btnSave.addEventListener('click', () => {
     const title = inputTitle.value || "Untitled Path";
     const groupName = inputGroup.value || "Ungrouped";
     const description = inputDesc.value || "No description provided.";
-    const type = inputType.value;
     const color1 = inputPrimaryColor.value;
     const color2 = inputSecondaryColor.value;
 
@@ -340,8 +427,12 @@ btnSave.addEventListener('click', () => {
         popupContent: { title, description }
     };
 
-    // Store globally
-    allPaths.push(newPath);
+    // Store globally based on type
+    if (type === 'marker') {
+        allPoints.push(newPath);
+    } else {
+        allPaths.push(newPath);
+    }
 
     // Draw the new path physically so the user sees it properly rendered
     drawPath(newPath.points, newPath.type, newPath.options, newPath.popupContent, newPath.group);
@@ -372,6 +463,20 @@ btnExport.addEventListener('click', () => {
     linkElement.setAttribute('download', exportFileDefaultName);
     linkElement.click();
 });
+
+if (btnExportPoints) {
+    btnExportPoints.addEventListener('click', () => {
+        const dataStr = JSON.stringify(allPoints, null, 4);
+        const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
+
+        const exportFileDefaultName = 'points.json';
+
+        let linkElement = document.createElement('a');
+        linkElement.setAttribute('href', dataUri);
+        linkElement.setAttribute('download', exportFileDefaultName);
+        linkElement.click();
+    });
+}
 
 // UI Collapse Logic
 const toggleVisBtn = document.getElementById('toggle-visibility');

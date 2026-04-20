@@ -1,0 +1,36 @@
+[
+    {
+        "points": [
+            [
+                3090,
+                5186
+            ]
+        ],
+        "type": "marker",
+        "group": "Points of Interest",
+        "options": {
+            "color": "#ff8800"
+        },
+        "popupContent": {
+            "title": "Autumn Grove",
+            "description": "The bastion of the Gem Seekers"
+        }
+    },
+    {
+        "points": [
+            [
+                2746,
+                5378.5
+            ]
+        ],
+        "type": "marker",
+        "group": "Points of Interest",
+        "options": {
+            "color": "#660f85"
+        },
+        "popupContent": {
+            "title": "Zemniaz",
+            "description": "An ancient city fallen from the sky and buried in the earth."
+        }
+    }
+]

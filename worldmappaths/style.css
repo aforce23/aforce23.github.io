@@ -260,3 +260,20 @@ body {
 #visibility-panel::-webkit-scrollbar { width: 8px; }
 #visibility-panel::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); }
 #visibility-panel::-webkit-scrollbar-thumb { background: #4da8da; border-radius: 4px; }
+
+/* Custom POI Map Tooltip */
+.poi-tooltip {
+    background: rgba(20, 25, 35, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: #4da8da;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    font-weight: 600;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: 8px;
+    padding: 6px 10px;
+    font-size: 13px;
+}
+.leaflet-tooltip-top.poi-tooltip::before {
+    border-top-color: rgba(20, 25, 35, 0.85);
+}
