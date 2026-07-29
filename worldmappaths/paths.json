@@ -735,5 +735,62 @@
             "title": "Session 44 & 45",
             "description": "The Gem Seekers travel to Hupperdook in a makeshift carriage affectionately know as the Gem Jalopy."
         }
+    },
+    {
+        "points": [
+            [
+                3405,
+                5108
+            ],
+            [
+                3371,
+                5149
+            ],
+            [
+                3339,
+                5165
+            ],
+            [
+                3323,
+                5180
+            ],
+            [
+                3283,
+                5213
+            ],
+            [
+                3233,
+                5237
+            ],
+            [
+                3184,
+                5248
+            ],
+            [
+                3128,
+                5248
+            ],
+            [
+                3095,
+                5191
+            ],
+            [
+                3108,
+                5141
+            ],
+            [
+                3226,
+                5069
+            ]
+        ],
+        "type": "normal",
+        "group": "Volume 3",
+        "options": {
+            "color": "#9effae"
+        },
+        "popupContent": {
+            "title": "Session 48",
+            "description": "The Gem Seekers return to Autumn Grove and put Derek into the coffee business. Then they head north for Alagorn's lair."
+        }
     }
 ]
